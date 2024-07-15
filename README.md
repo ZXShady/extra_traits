@@ -7,7 +7,58 @@ Minimum C++11 with support for variadic macros and variaidc templates
 all these are avaiablein namespace `zxshady::tmp` and all type traits have _t and _v shortcuts if aviable.
 
 
-has_operator_*
+has_operator_* (
+post_increment
+post_decrement
+pre_decrement
+pre_increment
+dereference
+negate
+complement
+unary_minus
+unary_plus
+bit_and
+bit_and_assign
+bit_or
+bit_or_assign
+bit_xor
+bit_xor_assign
+left_shift
+left_shift_assign
+right_shift
+right_shift_assign
+logical_and
+logical_not
+logical_or
+plus
+plus_assign
+minus
+minus_assign
+modulus
+modulus_assign
+multiply
+multiply_assign
+divide
+divide_assign
+equal_to
+not_equal_to
+less
+less_equal
+greater
+greater_equal
+arrow
+subscript
+call
+)
+
+each has_operator_\* has 4 static members
+
+```cpp
+has_operator_\*<T>::member; // whether it is a member function
+has_operator_\*<T>::free; // whether it is a free function
+has_operator_\*<T>::overloaded; // equalivent to member || free
+has_operator_\*<T>::value; // whether it has the operator or not
+```
 
 simple type aliases
 
