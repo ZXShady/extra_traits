@@ -105,7 +105,7 @@ remove_all_pointers<float(*)[]> -> float[];
 
 
 
-much more but I can't document it right now such as copy\_\*,clone\_\* from [paper](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2018/p1016r0.pdf) and type_list
+much more but I can't document it right now such as copy\_\*,clone\_\* from [paper](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2018/p1016r0.pdf) and type_list but you can look at the tests to get some idea.
 
 is_explicitly_constructible<T,Args...>
 is_implicitly_constructible<T,Args...>
