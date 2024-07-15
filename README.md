@@ -2,6 +2,8 @@
 
 simple library for some missing type traits I always need.
 
+all these are avaiablein namespace `zxshady::tmp`
+
 
 has_operator_*
 
@@ -12,7 +14,7 @@ simple type aliases
 index_constant<Value> = std::integral_constant<std::size_t,Value>;
 
 always_false<Types...> = std::false_type;
-always_true<Types...> = std::false_type;
+always_true<Types...> = std::true_type;
 
 ```
 
@@ -25,6 +27,19 @@ as_cv(T&)
 forward_like<Like>(T&)
 ```
 
+utility traits
+
+
+underlying_type_or<T,OrElse> : if T is an enum then get the underliny type otherwise OrElse type
+
+
+
+unary traits
+```cpp
+is_scoped_enum<Enum>::value
+is_unscoped_enum<Enum>::value
+```
+
 modifying traits
 ```cpp
 remove_all_pointers<int******> -> int;
@@ -32,7 +47,9 @@ remove_all_pointers<float(*)[]> -> float[];
 ```
 
 
-much more but I can't document it right now such as copy_*,clone_* from [paper](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2018/p1016r0.pdf)
+
+
+much more but I can't document it right now such as copy_*,clone_* from [paper](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2018/p1016r0.pdf) and type_list
 
 is_explicitly_constructible<T,Args...>
 is_implicitly_constructible<T,Args...>
