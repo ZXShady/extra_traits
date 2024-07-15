@@ -2,7 +2,9 @@
 
 simple library for some missing type traits I always need.
 
-all these are avaiablein namespace `zxshady::tmp`
+Minimum C++11 with support for variadic macros and variaidc templates
+
+all these are avaiablein namespace `zxshady::tmp` and all type traits have _t and _v shortcuts if aviable.
 
 
 has_operator_*
@@ -30,7 +32,7 @@ forward_like<Like>(T&)
 utility traits
 
 
-underlying_type_or<T,OrElse> : if T is an enum then get the underliny type otherwise OrElse type
+typename underlying_type_or<T,OrElse>::type : if T is an enum then get the underliny type otherwise OrElse type
 
 
 
