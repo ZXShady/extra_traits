@@ -7,49 +7,51 @@ Minimum C++11 with support for variadic macros and variaidc templates
 all these are avaiablein namespace `zxshady::tmp` and all type traits have _t and _v shortcuts if aviable.
 
 
-has_operator_* (
-post_increment
-post_decrement
-pre_decrement
-pre_increment
-dereference
-negate
-complement
-unary_minus
-unary_plus
-bit_and
-bit_and_assign
-bit_or
-bit_or_assign
-bit_xor
-bit_xor_assign
-left_shift
-left_shift_assign
-right_shift
-right_shift_assign
-logical_and
-logical_not
-logical_or
-plus
-plus_assign
-minus
-minus_assign
-modulus
-modulus_assign
-multiply
-multiply_assign
-divide
-divide_assign
-equal_to
-not_equal_to
-less
-less_equal
-greater
-greater_equal
-arrow
-subscript
-call
-)
+has_operator_*
+
+| Category | Operator |
+|---|---|
+| Increment/Decrement | post_increment |
+| | pre_decrement |
+| | pre_increment |
+| | post_increment |
+| Unary | dereference |
+| | negate |
+| | complement |
+| | unary_minus |
+| | unary_plus |
+| Bitwise | bit_and |
+| | bit_or |
+| | bit_xor |
+| | bit_and_assign |
+| | bit_or_assign |
+| | bit_xor_assign |
+| Shift | left_shift |
+| | left_shift_assign |
+| | right_shift |
+| | right_shift_assign |
+| Logical | logical_and |
+| | logical_not |
+| | logical_or |
+| Arithmetic | plus |
+| | minus |
+| | modulus |
+| | multiply |
+| | divide |
+| | plus_assign |
+| | minus_assign |
+| | modulus_assign |
+| | multiply_assign |
+| | divide_assign |
+| Comparison | equal_to |
+| | not_equal_to |
+| | less |
+| | less_equal |
+| | greater |
+| | greater_equal |
+| Special | arrow |
+| | subscript |
+| | call |
 
 each has_operator_\* has 4 static members
 
