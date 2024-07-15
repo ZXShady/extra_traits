@@ -51,10 +51,10 @@ remove_all_pointers<float(*)[]> -> float[];
 
 
 
-much more but I can't document it right now such as copy_*,clone_* from [paper](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2018/p1016r0.pdf) and type_list
+much more but I can't document it right now such as copy\_\*,clone\_\* from [paper](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2018/p1016r0.pdf) and type_list
 
 is_explicitly_constructible<T,Args...>
 is_implicitly_constructible<T,Args...>
 
-there is also is_*_default_constructible and is_*_copy_constructible and is_*_move_contructible
+there is also is_*_default_constructible and is\_\*\_copy_constructible and is\_\*\_move_contructible
 
