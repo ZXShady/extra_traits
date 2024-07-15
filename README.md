@@ -85,8 +85,9 @@ forward_like<Like>(T&)
 utility traits
 
 
-typename underlying_type_or<T,OrElse>::type : if T is an enum then get the underliny type otherwise OrElse type
-
+```cpp
+ underlying_type_or<T,OrElse>::type // if T is an enum then get the underlying type otherwise OrElse type
+```
 
 
 unary traits
@@ -109,5 +110,5 @@ much more but I can't document it right now such as copy\_\*,clone\_\* from [pap
 is_explicitly_constructible<T,Args...>
 is_implicitly_constructible<T,Args...>
 
-there is also is_*_default_constructible and is\_\*\_copy_constructible and is\_\*\_move_contructible
+there is also is_[explicitly|implicitly]_default_constructible and is\_[explicitly|implicitly]\_copy_constructible and is\_[explicitly|implicitly]\_move_contructible
 
