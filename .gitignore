@@ -30,3 +30,16 @@
 *.exe
 *.out
 *.app
+
+# Solution files
+*.user
+*.vcxproj
+*.vcxproj.user
+*.vcxproj.filters
+*.sln 
+
+Debug/
+build/
+CMakeFiles/
+.vs/
+.xmake/
