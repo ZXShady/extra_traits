@@ -1,10 +1,9 @@
 #include "test.hpp"
 
-#define TRY_FOR(trait, qual1, qual2)         \
+#define TRY_FOR(trait, qual1, qual2)          \
   IS_SAME(trait##_t<int qual1>, int qual2);   \
   IS_SAME(trait##_t<char qual1>, char qual2); \
   IS_SAME(trait##_t<unsigned int qual1>, unsigned int qual2)
-
 
 
 #define empty
@@ -14,6 +13,6 @@ TRY_FOR(remove_cvref, const&&, empty);
 TRY_FOR(remove_cvref, volatile&&, empty);
 TRY_FOR(remove_cvref, volatile const&&, empty);
 
-TRY_FOR(remove_cvref, const*const&&, const*);
-TRY_FOR(remove_cvref, volatile*const&&, volatile*);
-TRY_FOR(remove_cvref, volatile const*const&&, const volatile*);
+TRY_FOR(remove_cvref, const* const&&, const*);
+TRY_FOR(remove_cvref, volatile* const&&, volatile*);
+TRY_FOR(remove_cvref, volatile const* const&&, const volatile*);

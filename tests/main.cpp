@@ -1,7 +1,8 @@
-#include <cstdio>
+#include <vector>
 
-int main()
-{
-	std::puts("All tests are static asserts lol.");
-	return 0;
+#include "test.hpp"
+#include <zxshady/extra_traits.hpp>
+
+int main() { 
+    return 0;
 }

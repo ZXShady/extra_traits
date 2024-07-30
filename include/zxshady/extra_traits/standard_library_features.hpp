@@ -1,13 +1,6 @@
 #ifndef ZXSHADY_EXTRA_TRAITS_STANDARD_LIBRARY_FEATURES
 #define ZXSHADY_EXTRA_TRAITS_STANDARD_LIBRARY_FEATURES
 
-#if defined(_MSVC_LANG) && __cplusplus != _MSVC_LANG
-
-  #error this library requires for MSVC the /Zc:__cplusplus option to properly update __cplusplus macro which is needed.
-
-#endif
-
-
 #include "macros.hpp"
 
 #include <type_traits>
@@ -17,7 +10,7 @@
 namespace zxshady {
 namespace tmp {
 
-#if __cplusplus >= 201402L
+#if __cplusplus >= 201402L || (defined(_MSVC_LANG) && _MSVC_LANG >= 201402L)
 
   using ::std::add_const_t;
   using ::std::add_cv_t;
@@ -84,10 +77,10 @@ namespace tmp {
 #else
 
   template<typename T>
-  using remove_cvref = std::remove_cv<remove_reference_t<T>>;
+  using remove_cvref = std::remove_cv<typename std::remove_reference<T>::type>;
 
   template<typename T>
-  using remove_cvref_t = typename std::remove_cv<remove_reference_t<T>>::type;
+  using remove_cvref_t = typename std::remove_cv<typename std::remove_reference<T>::type>::type;
 
 #endif
 
@@ -181,7 +174,11 @@ namespace tmp {
 
 #endif // !defined(__cpp_lib_integer_sequence)
 
-#ifdef __cpp_lib_logical_traits
+// is that another Compiler Bug with Microsoft Again???!
+// yes.
+// https://discord.com/channels/583251190591258624/583254410218700800/1263979538883416185
+// :D 
+#if defined(__cpp_lib_logical_traits) && !(defined(_MSC_VER) && !(defined(__clang__) || defined(__INTEL_COMPILER)))
   using ::std::conjunction;
   using ::std::conjunction_v;
   using ::std::disjunction;
@@ -209,13 +206,13 @@ namespace tmp {
   template<typename T>
   using negation = bool_constant<!T::value>;
 
+  #if defined(__cpp_variable_templates)
+  template<typename... Traits>
+  constexpr bool disjunction_v = disjunction<Traits...>::value;
+
   template<typename... Traits>
   constexpr bool conjunction_v = conjunction<Traits...>::value;
-  ZXCREATE_VAR_SHORTCUT_ARGS(disjunction, Traits);
 
-  // special optimization for compile times instead of going through negation<T>::value;
-  // it is minor optimization
-  #if __cpp_variable_templates
   template<typename Trait>
   constexpr bool negation_v = !Trait::value;
   #endif
@@ -251,7 +248,12 @@ namespace tmp {
 
   template<typename T>
   using is_scoped_enum = details::is_scoped_enum<std::is_enum<T>::value, T>;
-  ZXCREATE_VAR_SHORTCUT_ARG(is_scoped_enum, T);
+
+  #if defined(__cpp_variable_templates)
+  template<typename T>
+  constexpr bool is_scoped_enum_v = is_scoped_enum<T>::value;
+  #endif
+
 #endif
 
 #ifdef __cpp_lib_bounded_array_traits

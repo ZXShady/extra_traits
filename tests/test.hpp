@@ -13,9 +13,9 @@ constexpr bool is_equal(T t, U u)
 {
   return t == static_cast<T>(u);
 }
-#define IS_SAME(...)       static_assert(std::is_same<__VA_ARGS__>::value, #__VA_ARGS__)
 #define INT_CONST(...)     static_assert(is_equal(__VA_ARGS__), #__VA_ARGS__)
 #define STATIC_ASSERT(...) static_assert(__VA_ARGS__, #__VA_ARGS__)
+#define IS_SAME(...)       STATIC_ASSERT(std::is_same<__VA_ARGS__>::value)
 
 
 #endif // !TEST_HPP

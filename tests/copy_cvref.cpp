@@ -1,178 +1,181 @@
-/*
-Copyright 2019 Glen Joseph Fernandes
-(glenjofe@gmail.com)
-
-Distributed under the Boost Software License,
-Version 1.0. (See accompanying file LICENSE_1_0.txt
-or copy at http://www.boost.org/LICENSE_1_0.txt)
-*/
-
 #include "test.hpp"
 
-template<typename F,typename T>
-using copy_cvref_r = copy_cvref_t<T,F>;
+#define COPY_CVREF(from, to, should) IS_SAME(copy_cvref_t<int from, char to>, type_identity_t<char> should)
 
-IS_SAME(copy_cvref_r<int, char>, int);
-IS_SAME(copy_cvref_r<int, const char>, const int);
-IS_SAME(copy_cvref_r<int, volatile char>, volatile int);
-IS_SAME(copy_cvref_r<int, const volatile char>, const volatile int);
-IS_SAME(copy_cvref_r<int, char&>, int&);
-IS_SAME(copy_cvref_r<int, const char&>, const int&);
-IS_SAME(copy_cvref_r<int, volatile char&>, volatile int&);
-IS_SAME(copy_cvref_r<int, const volatile char&>, const volatile int&);
+#define empty /**/
 
-IS_SAME(copy_cvref_r<const int, char>, const int);
-IS_SAME(copy_cvref_r<const int, const char>, const int);
-IS_SAME(copy_cvref_r<const int, volatile char>, const volatile int);
-IS_SAME(copy_cvref_r<const int, const volatile char>, const volatile int);
-IS_SAME(copy_cvref_r<const int, char&>, const int&);
-IS_SAME(copy_cvref_r<const int, const char&>, const int&);
-IS_SAME(copy_cvref_r<const int, volatile char&>, const volatile int&);
-IS_SAME(copy_cvref_r<const int, const volatile char&>, const volatile int&);
 
-IS_SAME(copy_cvref_r<volatile int, char>, volatile int);
-IS_SAME(copy_cvref_r<volatile int, const char>, const volatile int);
-IS_SAME(copy_cvref_r<volatile int, volatile char>, volatile int);
-IS_SAME(copy_cvref_r<volatile int, const volatile char>, const volatile int);
-IS_SAME(copy_cvref_r<volatile int, char&>, volatile int&);
-IS_SAME(copy_cvref_r<volatile int, const char&>, const volatile int&);
-IS_SAME(copy_cvref_r<volatile int, volatile char&>, volatile int&);
-IS_SAME(copy_cvref_r<volatile int, const volatile char&>, const volatile int&);
+// clang-format off
 
-IS_SAME(copy_cvref_r<const volatile int, char>, const volatile int);
-IS_SAME(copy_cvref_r<const volatile int, const char>, const volatile int);
-IS_SAME(copy_cvref_r<const volatile int, volatile char>, const volatile int);
-IS_SAME(copy_cvref_r<const volatile int, const volatile char>, const volatile int);
-IS_SAME(copy_cvref_r<const volatile int, char&>, const volatile int&);
-IS_SAME(copy_cvref_r<const volatile int, const char&>, const volatile int&);
-IS_SAME(copy_cvref_r<const volatile int, volatile char&>, const volatile int&);
-IS_SAME(copy_cvref_r<const volatile int, const volatile char&>, const volatile int&);
 
-IS_SAME(copy_cvref_r<int&, char>, int&);
-IS_SAME(copy_cvref_r<int&, const char>, const int&);
-IS_SAME(copy_cvref_r<int&, volatile char>, volatile int&);
-IS_SAME(copy_cvref_r<int&, const volatile char>, const volatile int&);
-IS_SAME(copy_cvref_r<int&, char&>, int&);
-IS_SAME(copy_cvref_r<int&, const char&>, const int&);
-IS_SAME(copy_cvref_r<int&, volatile char&>, volatile int&);
-IS_SAME(copy_cvref_r<int&, const volatile char&>, const volatile int&);
+COPY_CVREF(empty, empty         ,empty);
+COPY_CVREF(empty, const         ,const);
+COPY_CVREF(empty, volatile      ,volatile);
+COPY_CVREF(empty, const volatile,const volatile);
 
-IS_SAME(copy_cvref_r<const int&, char>, const int&);
-IS_SAME(copy_cvref_r<const int&, const char>, const int&);
-IS_SAME(copy_cvref_r<const int&, volatile char>, const volatile int&);
-IS_SAME(copy_cvref_r<const int&, const volatile char>, const volatile int&);
-IS_SAME(copy_cvref_r<const int&, char&>, const int&);
-IS_SAME(copy_cvref_r<const int&, const char&>, const int&);
-IS_SAME(copy_cvref_r<const int&, volatile char&>, const volatile int&);
-IS_SAME(copy_cvref_r<const int&, const volatile char&>, const volatile int&);
 
-IS_SAME(copy_cvref_r<volatile int&, char>, volatile int&);
-IS_SAME(copy_cvref_r<volatile int&, const char>, const volatile int&);
-IS_SAME(copy_cvref_r<volatile int&, volatile char>, volatile int&);
-IS_SAME(copy_cvref_r<volatile int&, const volatile char>, const volatile int&);
-IS_SAME(copy_cvref_r<volatile int&, char&>, volatile int&);
-IS_SAME(copy_cvref_r<volatile int&, const char&>, const volatile int&);
-IS_SAME(copy_cvref_r<volatile int&, volatile char&>, volatile int&);
-IS_SAME(copy_cvref_r<volatile int&, const volatile char&>,const volatile int&);
+COPY_CVREF(const         , empty,const);
+COPY_CVREF(volatile      , empty,volatile);
+COPY_CVREF(const volatile, empty,const volatile);
 
-IS_SAME(copy_cvref_r<const volatile int&, char>, const volatile int&);
-IS_SAME(copy_cvref_r<const volatile int&, const char>, const volatile int&);
-IS_SAME(copy_cvref_r<const volatile int&, volatile char>, const volatile int&);
-IS_SAME(copy_cvref_r<const volatile int&, const volatile char>, const volatile int&);
-IS_SAME(copy_cvref_r<const volatile int&, char&>, const volatile int&);
-IS_SAME(copy_cvref_r<const volatile int&, const char&>, const volatile int&);
-IS_SAME(copy_cvref_r<const volatile int&, volatile char&>, const volatile int&);
-IS_SAME(copy_cvref_r<const volatile int&, const volatile char&>, const volatile int&);
+COPY_CVREF(const, empty         ,const);
+COPY_CVREF(const, const         ,const);
+COPY_CVREF(const, volatile      ,const volatile);
+COPY_CVREF(const, const volatile,const volatile);
 
-IS_SAME(copy_cvref_r<int, char&&>, int&&);
-IS_SAME(copy_cvref_r<int, const char&&>, const int&&);
-IS_SAME(copy_cvref_r<int, volatile char&&>, volatile int&&);
-IS_SAME(copy_cvref_r<int, const volatile char&&>, const volatile int&&);
 
-IS_SAME(copy_cvref_r<const int, char&&>, const int&&);
-IS_SAME(copy_cvref_r<const int, const char&&>, const int&&);
-IS_SAME(copy_cvref_r<const int, volatile char&&>, const volatile int&&);
-IS_SAME(copy_cvref_r<const int, const volatile char&&>, const volatile int&&);
+COPY_CVREF(volatile, empty         ,volatile);
+COPY_CVREF(volatile, const         ,const volatile);
+COPY_CVREF(volatile, volatile      ,volatile);
+COPY_CVREF(volatile, const volatile,const volatile);
 
-IS_SAME(copy_cvref_r<volatile int, char&&>, volatile int&&);
-IS_SAME(copy_cvref_r<volatile int, const char&&>, const volatile int&&);
-IS_SAME(copy_cvref_r<volatile int, volatile char&&>, volatile int&&);
-IS_SAME(copy_cvref_r<volatile int, const volatile char&&>, const volatile int&&);
+COPY_CVREF(const volatile, empty         ,const volatile);
+COPY_CVREF(const volatile, const         ,const volatile);
+COPY_CVREF(const volatile, volatile      ,const volatile);
+COPY_CVREF(const volatile, const volatile,const volatile);
 
-IS_SAME(copy_cvref_r<const volatile int, char&&>, const volatile int&&);
-IS_SAME(copy_cvref_r<const volatile int, const char&&>, const volatile int&&);
-IS_SAME(copy_cvref_r<const volatile int, volatile char&&>, const volatile int&&);
-IS_SAME(copy_cvref_r<const volatile int, const volatile char&&>, const volatile int&&);
 
-IS_SAME(copy_cvref_r<int&, char&&>, int&);
-IS_SAME(copy_cvref_r<int&, const char&&>, const int&);
-IS_SAME(copy_cvref_r<int&, volatile char&&>, volatile int&);
-IS_SAME(copy_cvref_r<int&, const volatile char&&>, const volatile int&);
+COPY_CVREF(empty         , &,&);
+COPY_CVREF(const         , &,const&);
+COPY_CVREF(volatile      , &,volatile&);
+COPY_CVREF(const volatile, &,const volatile&);
 
-IS_SAME(copy_cvref_r<const int&, char&&>, const int&);
-IS_SAME(copy_cvref_r<const int&, const char&&>, const int&);
-IS_SAME(copy_cvref_r<const int&, volatile char&&>, const volatile int&);
-IS_SAME(copy_cvref_r<const int&, const volatile char&&>, const volatile int&);
+COPY_CVREF(empty         , const&,const&);
+COPY_CVREF(const         , const&,const&);
+COPY_CVREF(volatile      , const&,const volatile&);
+COPY_CVREF(const volatile, const&,const volatile&);
 
-IS_SAME(copy_cvref_r<volatile int&, char&&>, volatile int&);
-IS_SAME(copy_cvref_r<volatile int&, const char&&>, const volatile int&);
-IS_SAME(copy_cvref_r<volatile int&, volatile char&&>, volatile int&);
-IS_SAME(copy_cvref_r<volatile int&, const volatile char&&>,const volatile int&);
+COPY_CVREF(empty         , volatile&,volatile&);
+COPY_CVREF(const         , volatile&,const volatile&);
+COPY_CVREF(volatile      , volatile&,volatile&);
+COPY_CVREF(const volatile, volatile&,const volatile&);
 
-IS_SAME(copy_cvref_r<const volatile int&, char&&>, const volatile int&);
-IS_SAME(copy_cvref_r<const volatile int&, const char&&>, const volatile int&);
-IS_SAME(copy_cvref_r<const volatile int&, volatile char&&>, const volatile int&);
-IS_SAME(copy_cvref_r<const volatile int&, const volatile char&&>, const volatile int&);
+COPY_CVREF(empty         , const volatile&,const volatile&);
+COPY_CVREF(const         , const volatile&,const volatile&);
+COPY_CVREF(volatile      , const volatile&,const volatile&);
+COPY_CVREF(const volatile, const volatile&,const volatile&);
 
-IS_SAME(copy_cvref_r<int&&, char>, int&&);
-IS_SAME(copy_cvref_r<int&&, const char>, const int&&);
-IS_SAME(copy_cvref_r<int&&, volatile char>, volatile int&&);
-IS_SAME(copy_cvref_r<int&&, const volatile char>, const volatile int&&);
-IS_SAME(copy_cvref_r<int&&, char&>, int&);
-IS_SAME(copy_cvref_r<int&&, const char&>, const int&);
-IS_SAME(copy_cvref_r<int&&, volatile char&>, volatile int&);
-IS_SAME(copy_cvref_r<int&&, const volatile char&>, const volatile int&);
-IS_SAME(copy_cvref_r<int&&, char&&>, int&&);
-IS_SAME(copy_cvref_r<int&&, const char&&>, const int&&);
-IS_SAME(copy_cvref_r<int&&, volatile char&&>, volatile int&&);
-IS_SAME(copy_cvref_r<int&&, const volatile char&&>, const volatile int&&);
+COPY_CVREF(empty         , &&,&&);
+COPY_CVREF(const         , &&,const&&);
+COPY_CVREF(volatile      , &&,volatile&&);
+COPY_CVREF(const volatile, &&,const volatile&&);
 
-IS_SAME(copy_cvref_r<const int&&, char>, const int&&);
-IS_SAME(copy_cvref_r<const int&&, const char>, const int&&);
-IS_SAME(copy_cvref_r<const int&&, volatile char>, const volatile int&&);
-IS_SAME(copy_cvref_r<const int&&, const volatile char>, const volatile int&&);
-IS_SAME(copy_cvref_r<const int&&, char&>, const int&);
-IS_SAME(copy_cvref_r<const int&&, const char&>, const int&);
-IS_SAME(copy_cvref_r<const int&&, volatile char&>, const volatile int&);
-IS_SAME(copy_cvref_r<const int&&, const volatile char&>, const volatile int&);
-IS_SAME(copy_cvref_r<const int&&, char&&>, const int&&);
-IS_SAME(copy_cvref_r<const int&&, const char&&>, const int&&);
-IS_SAME(copy_cvref_r<const int&&, volatile char&&>, const volatile int&&);
-IS_SAME(copy_cvref_r<const int&&, const volatile char&&>, const volatile int&&);
+COPY_CVREF(empty         , const&&,const&&);
+COPY_CVREF(const         , const&&,const&&);
+COPY_CVREF(volatile      , const&&,const volatile&&);
+COPY_CVREF(const volatile, const&&,const volatile&&);
 
-IS_SAME(copy_cvref_r<volatile int&&, char>, volatile int&&);
-IS_SAME(copy_cvref_r<volatile int&&, const char>, const volatile int&&);
-IS_SAME(copy_cvref_r<volatile int&&, volatile char>, volatile int&&);
-IS_SAME(copy_cvref_r<volatile int&&, const volatile char>, const volatile int&&);
-IS_SAME(copy_cvref_r<volatile int&&, char&>, volatile int&);
-IS_SAME(copy_cvref_r<volatile int&&, const char&>, const volatile int&);
-IS_SAME(copy_cvref_r<volatile int&&, volatile char&>, volatile int&);
-IS_SAME(copy_cvref_r<volatile int&&, const volatile char&>,const volatile int&);
-IS_SAME(copy_cvref_r<volatile int&&, char&&>, volatile int&&);
-IS_SAME(copy_cvref_r<volatile int&&, const char&&>, const volatile int&&);
-IS_SAME(copy_cvref_r<volatile int&&, volatile char&&>, volatile int&&);
-IS_SAME(copy_cvref_r<volatile int&&, const volatile char&&>, const volatile int&&);
+COPY_CVREF(empty         , volatile&&,volatile&&);
+COPY_CVREF(const         , volatile&&,const volatile&&);
+COPY_CVREF(volatile      , volatile&&,volatile&&);
+COPY_CVREF(const volatile, volatile&&,const volatile&&);
 
-IS_SAME(copy_cvref_r<const volatile int&&, char>, const volatile int&&);
-IS_SAME(copy_cvref_r<const volatile int&&, const char>, const volatile int&&);
-IS_SAME(copy_cvref_r<const volatile int&&, volatile char>, const volatile int&&);
-IS_SAME(copy_cvref_r<const volatile int&&, const volatile char>, const volatile int&&);
-IS_SAME(copy_cvref_r<const volatile int&&, char&>, const volatile int&);
-IS_SAME(copy_cvref_r<const volatile int&&, const char&>, const volatile int&);
-IS_SAME(copy_cvref_r<const volatile int&&, volatile char&>, const volatile int&);
-IS_SAME(copy_cvref_r<const volatile int&&, const volatile char&>, const volatile int&);
-IS_SAME(copy_cvref_r<const volatile int&&, char&&>, const volatile int&&);
-IS_SAME(copy_cvref_r<const volatile int&&, const char&&>, const volatile int&&);
-IS_SAME(copy_cvref_r<const volatile int&&, volatile char&&>, const volatile int&&);
-IS_SAME(copy_cvref_r<const volatile int&&, const volatile char&&>, const volatile int&&);
+COPY_CVREF(empty         , const volatile&&,const volatile&&);
+COPY_CVREF(const         , const volatile&&,const volatile&&);
+COPY_CVREF(volatile      , const volatile&&,const volatile&&);
+COPY_CVREF(const volatile, const volatile&&,const volatile&&);
 
+COPY_CVREF(&, empty         ,&);
+COPY_CVREF(&, const         ,const&);
+COPY_CVREF(&, volatile      ,volatile&);
+COPY_CVREF(&, const volatile,const volatile&);
+
+COPY_CVREF(const&, empty         ,const&);
+COPY_CVREF(const&, const         ,const&);
+COPY_CVREF(const&, volatile      ,const volatile&);
+COPY_CVREF(const&, const volatile,const volatile&);
+
+COPY_CVREF(volatile&, empty         ,volatile&);
+COPY_CVREF(volatile&, const         ,const volatile&);
+COPY_CVREF(volatile&, volatile      ,volatile&);
+COPY_CVREF(volatile&, const volatile,const volatile&);
+
+COPY_CVREF(const volatile&, empty         ,const volatile&);
+COPY_CVREF(const volatile&, const         ,const volatile&);
+COPY_CVREF(const volatile&, volatile      ,const volatile&);
+COPY_CVREF(const volatile&, const volatile,const volatile&);
+
+COPY_CVREF(&&, empty         ,&&);
+COPY_CVREF(&&, const         ,const&&);
+COPY_CVREF(&&, volatile      ,volatile&&);
+COPY_CVREF(&&, const volatile,const volatile&&);
+
+COPY_CVREF(const&&, empty         ,const &&);
+COPY_CVREF(const&&, const         ,const&&);
+COPY_CVREF(const&&, volatile      ,const volatile&&);
+COPY_CVREF(const&&, const volatile,const volatile&&);
+
+COPY_CVREF(volatile&&, empty         ,volatile&&);
+COPY_CVREF(volatile&&, const         ,const volatile&&);
+COPY_CVREF(volatile&&, volatile      ,volatile&&);
+COPY_CVREF(volatile&&, const volatile,const volatile&&);
+
+COPY_CVREF(const volatile&&, empty         ,const volatile&&);
+COPY_CVREF(const volatile&&, const         ,const volatile&&);
+COPY_CVREF(const volatile&&, volatile      ,const volatile&&);
+COPY_CVREF(const volatile&&, const volatile,const volatile&&);
+
+
+COPY_CVREF(&,               &,&);
+COPY_CVREF(const&,          &,const&);
+COPY_CVREF(volatile&,       &,volatile&);
+COPY_CVREF(const volatile&, &,const volatile&);
+
+COPY_CVREF(&,               const&,const&);
+COPY_CVREF(const&,          const&,const&);
+COPY_CVREF(volatile&,       const&,const volatile&);
+COPY_CVREF(const volatile&, const&,const volatile&);
+
+COPY_CVREF(&,               volatile&,volatile&);
+COPY_CVREF(const&,          volatile&,const volatile&);
+COPY_CVREF(volatile&,       volatile&,volatile&);
+COPY_CVREF(const volatile&, volatile&,const volatile&);
+
+COPY_CVREF(&,              const volatile&,const volatile&);
+COPY_CVREF(const&,         const volatile&,const volatile&);
+COPY_CVREF(volatile&,      const volatile&,const volatile&);
+COPY_CVREF(const volatile&,const volatile&,const volatile&);
+
+COPY_CVREF(&,               &&,&);
+COPY_CVREF(const&,          &&,const&);
+COPY_CVREF(volatile&,       &&,volatile&);
+COPY_CVREF(const volatile&, &&,const volatile&);
+
+COPY_CVREF(&,               const&&,const&);
+COPY_CVREF(const&,          const&&,const&);
+COPY_CVREF(volatile&,       const&&,const volatile&);
+COPY_CVREF(const volatile&, const&&,const volatile&);
+
+COPY_CVREF(&,               volatile&&,volatile&);
+COPY_CVREF(const&,          volatile&&,const volatile&);
+COPY_CVREF(volatile&,       volatile&&,volatile&);
+COPY_CVREF(const volatile&, volatile&&,const volatile&);
+
+COPY_CVREF(&,              const volatile&&,const volatile&);
+COPY_CVREF(const&,         const volatile&&,const volatile&);
+COPY_CVREF(volatile&,      const volatile&&,const volatile&);
+COPY_CVREF(const volatile&,const volatile&&,const volatile&);
+
+
+
+COPY_CVREF(&&,               &,&);
+COPY_CVREF(const&&,          &,const&);
+COPY_CVREF(volatile&&,       &,volatile&);
+COPY_CVREF(const volatile&&, &,const volatile&);
+
+COPY_CVREF(&&,               const&,const&);
+COPY_CVREF(const&&,          const&,const&);
+COPY_CVREF(volatile&&,       const&,const volatile&);
+COPY_CVREF(const volatile&&, const&,const volatile&);
+
+COPY_CVREF(&&,               volatile&,volatile&);
+COPY_CVREF(const&&,          volatile&,const volatile&);
+COPY_CVREF(volatile&&,       volatile&,volatile&);
+COPY_CVREF(const volatile&&, volatile&,const volatile&);
+
+COPY_CVREF(&&,              const volatile&,const volatile&);
+COPY_CVREF(const&&,         const volatile&,const volatile&);
+COPY_CVREF(volatile&&,      const volatile&,const volatile&);
+COPY_CVREF(const volatile&&,const volatile&,const volatile&);
+
+// clang-format on

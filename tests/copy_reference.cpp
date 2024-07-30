@@ -1,6 +1,6 @@
 #include "test.hpp"
 
-#define COPY_REFERENCE(from, to,same) IS_SAME(copy_reference_t<int from, char to>, char same)
+#define COPY_REFERENCE(from, to,should) IS_SAME(copy_reference_t<int from, char to>, char should)
 
 #define empty /**/
 

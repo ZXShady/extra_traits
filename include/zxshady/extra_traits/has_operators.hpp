@@ -14,7 +14,7 @@
       static constexpr bool member     = requires(T t) { ZXSHADY_FWD(t).operator op_symbol(); }; \
       static constexpr bool overloaded = free || member;                                         \
       static constexpr bool value      = requires(T t) { op_symbol ZXSHADY_FWD(t); };            \
-    };
+    }
   #define ZXSHADY_XMACRO_HAS_BINARY_OPERATOR(op_name, op_symbol)                                                     \
     template<typename T, typename U = T>                                                                             \
     struct has_operator_##op_name {                                                                                  \
@@ -22,7 +22,7 @@
       static constexpr bool member     = requires(T t, U u) { ZXSHADY_FWD(t).operator op_symbol(ZXSHADY_FWD(u)); };  \
       static constexpr bool overloaded = free || member;                                                             \
       static constexpr bool value      = requires(T t, U u) { ZXSHADY_FWD(t) op_symbol ZXSHADY_FWD(u); };            \
-    };
+    }
 
   #define ZXSHADY_XMACRO_HAS_POST_INC_DEC_OPERATOR(op_name, op_symbol)                             \
     template<typename T>                                                                           \
@@ -35,23 +35,23 @@
 
 #else
 
-  #define ZXSHADY_XMACRO_HAS_UNARY_OPERATOR(op_name, op_symbol)                                            \
-    template<typename T>                                                                                   \
-    struct has_operator_##op_name {                                                                        \
-      using this_type = has_operator_##op_name;                                                            \
-      template<typename U>                                                                                 \
-      static auto member_check(U&& u) -> decltype(ZXSHADY_FWD(u).operatorop_symbol(), std::true_type{}); \
-      static auto member_check(...) -> std::false_type;                                                    \
-      template<typename U>                                                                                 \
+  #define ZXSHADY_XMACRO_HAS_UNARY_OPERATOR(op_name, op_symbol)                                           \
+    template<typename T>                                                                                  \
+    struct has_operator_##op_name {                                                                       \
+      using this_type = has_operator_##op_name;                                                           \
+      template<typename U>                                                                                \
+      static auto member_check(U&& u) -> decltype(ZXSHADY_FWD(u).operator op_symbol(), std::true_type{}); \
+      static auto member_check(...) -> std::false_type;                                                   \
+      template<typename U>                                                                                \
       static auto free_check(U&& u) -> decltype(operator op_symbol(ZXSHADY_FWD(u)), std::true_type{});    \
-      static auto free_check(...) -> std::false_type;                                                      \
-      template<typename U>                                                                                 \
-      static auto           check(U&& u) -> decltype(op_symbol ZXSHADY_FWD(u), std::true_type{});          \
-      static auto           check(...) -> std::false_type;                                                 \
-      static constexpr bool free       = decltype(this_type::free_check(std::declval<T>()))::value;        \
-      static constexpr bool member     = decltype(this_type::member_check(std::declval<T>()))::value;      \
-      static constexpr bool overloaded = member || free;                                                   \
-      static constexpr bool value      = decltype(this_type::check(std::declval<T>()))::value;             \
+      static auto free_check(...) -> std::false_type;                                                     \
+      template<typename U>                                                                                \
+      static auto           check(U&& u) -> decltype(op_symbol ZXSHADY_FWD(u), std::true_type{});         \
+      static auto           check(...) -> std::false_type;                                                \
+      static constexpr bool free       = decltype(this_type::free_check(std::declval<T>()))::value;       \
+      static constexpr bool member     = decltype(this_type::member_check(std::declval<T>()))::value;     \
+      static constexpr bool overloaded = member || free;                                                  \
+      static constexpr bool value      = decltype(this_type::check(std::declval<T>()))::value;            \
     }
 
 
@@ -64,8 +64,8 @@
         -> decltype(ZXSHADY_FWD(l).operator op_symbol(ZXSHADY_FWD(r)), std::true_type{});                                \
       static auto member_check(...) -> std::false_type;                                                                  \
       template<typename L, typename R>                                                                                   \
-      static auto free_check(L&& l, U&& r)                                                                               \
-        -> decltype(operatorop_symbol(ZXSHADY_FWD(l), ZXSHADY_FWD(r)), std::true_type{});                              \
+      static auto free_check(L&& l, R&& r)                                                                               \
+        -> decltype(operator op_symbol(ZXSHADY_FWD(l), ZXSHADY_FWD(r)), std::true_type{});                               \
       static auto free_check(...) -> std::false_type;                                                                    \
       template<typename L, typename R>                                                                                   \
       static auto           check(L&& l, R&& r) -> decltype(ZXSHADY_FWD(l) op_symbol ZXSHADY_FWD(r), std::true_type{});  \
@@ -96,7 +96,6 @@
     }
 
 #endif // __cpp_concepts
-
 
 namespace zxshady {
 namespace tmp {
@@ -129,8 +128,9 @@ namespace tmp {
   ZXSHADY_XMACRO_HAS_UNARY_OPERATOR(logical_not, !);
   ZXSHADY_XMACRO_HAS_BINARY_OPERATOR(logical_or, ||);
 
+  
   // arithematic
-  ZXSHADY_XMACRO_HAS_BINARY_OPERATOR(plus, +);
+  ZXSHADY_XMACRO_HAS_BINARY_OPERATOR(plus, +); 
   ZXSHADY_XMACRO_HAS_BINARY_OPERATOR(plus_assign, +=);
   ZXSHADY_XMACRO_HAS_BINARY_OPERATOR(minus, -);
   ZXSHADY_XMACRO_HAS_BINARY_OPERATOR(minus_assign, -=);
@@ -151,34 +151,44 @@ namespace tmp {
   //delete_operator
   //new_operator
 #ifdef __cpp_multidimensional_subscript
-
-  #define ZXSHADY_INDEXES_1044 ...
-#else
-  #define ZXSHADY_INDEXES_1044
-#endif // __cpp_multidimensional_subscript
-
-  template<typename T, typename ZXSHADY_INDEXES_1044 Index>
+  template<typename T, typename... Indices>
   struct has_operator_subscript {
   private:
     using this_type = has_operator_subscript;
     template<typename U = T>
-    static auto member_check(U&& u, Index&& ZXSHADY_INDEXES_1044 index)
-      -> decltype(ZXSHADY_FWD(u).operator[](ZXSHADY_FWD(index) ZXSHADY_INDEXES_1044), std::true_type{});
+    static auto member_check(U&& u, Indices&&... indices)
+      -> decltype(ZXSHADY_FWD(u).operator[](ZXSHADY_FWD(indices)...), std::true_type{});
     static auto member_check(...) -> std::false_type;
     template<typename U = T>
-    static auto check(U&& u, Index&& ZXSHADY_INDEXES_1044 index)
-      -> decltype(ZXSHADY_FWD(u)[ZXSHADY_FWD(index) ZXSHADY_INDEXES_1044], std::true_type{});
+    static auto check(U&& u, Indices&&... indices) -> decltype(ZXSHADY_FWD(u)[ZXSHADY_FWD(indices)...], std::true_type{});
     static auto check(...) -> std::false_type;
 
   public:
-    static constexpr bool free       = false;
-    static constexpr bool member     = decltype(this_type::member_check(std::declval<T>(),
-                                                                    std::declval<Index> ZXSHADY_INDEXES_1044))::value;
+    static constexpr bool free = false;
+    static constexpr bool member = decltype(this_type::member_check(std::declval<T>(), std::declval<Indices>()...))::value;
     static constexpr bool overloaded = member;
-    static constexpr bool value      = decltype(this_type::check(std::declval<T>(),
-                                                            std::declval<Index>() ZXSHADY_INDEXES_1044))::value;
+    static constexpr bool value      = decltype(this_type::check(std::declval<T>(), std::declval<Indices>()...))::value;
   };
+#else
+  template<typename T, typename Index>
+  struct has_operator_subscript {
+  private:
+    using this_type = has_operator_subscript;
+    template<typename U = T>
+    static auto member_check(U&& u, Index&& index)
+      -> decltype(ZXSHADY_FWD(u).operator[](ZXSHADY_FWD(index)), std::true_type{});
+    static auto member_check(...) -> std::false_type;
+    template<typename U = T>
+    static auto check(U&& u, Index&& index) -> decltype(ZXSHADY_FWD(u)[ZXSHADY_FWD(index)], std::true_type{});
+    static auto check(...) -> std::false_type;
 
+  public:
+    static constexpr bool free   = false;
+    static constexpr bool member = decltype(this_type::member_check(std::declval<T>(), std::declval<Index>()))::value;
+    static constexpr bool overloaded = member;
+    static constexpr bool value      = decltype(this_type::check(std::declval<T>(), std::declval<Index>()))::value;
+  };
+#endif // __cpp_multidimensional_subscript
 
   template<typename T>
   struct has_operator_arrow {
@@ -271,9 +281,14 @@ namespace tmp {
   MACRO_P(greater_equal);
 
   MACRO_P_UNARY(arrow)
-  template<typename T, typename ZXSHADY_INDEXES_1044 Index>
-  constexpr bool has_operator_subscript_v = has_operator_subscript<T, Index ZXSHADY_INDEXES_1044>::value;
-
+  #ifdef __cpp_multidimensional_subscript
+  template<typename T, typename... Indices>
+  constexpr bool has_operator_subscript_v = has_operator_subscript<T, Indices...>::value;
+  #elif defined(__cpp_variable_templates)
+  template<typename T, typename Index>
+  constexpr bool has_operator_subscript_v = has_operator_subscript<T, Index>::value;
+  #endif
+  
   template<typename T, typename... Args>
   constexpr bool has_operator_call_v = has_operator_call<T, Args...>::value;
 
