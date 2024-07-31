@@ -11,6 +11,6 @@ struct B1 final {};
 
 STATIC_ASSERT(!is_inheritable<U>::value);
 STATIC_ASSERT(is_inheritable<B0>::value);
-STATIC_ASSERT(!is_inheritable<U>::value);
+STATIC_ASSERT(!is_inheritable<B1>::value);
 
 #endif

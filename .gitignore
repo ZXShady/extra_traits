@@ -38,8 +38,13 @@
 *.vcxproj.filters
 *.sln 
 
+.cache/
+
 Debug/
 build/
+build_Clang/
+build_GCC/
+
 CMakeFiles/
 .vs/
 .xmake/

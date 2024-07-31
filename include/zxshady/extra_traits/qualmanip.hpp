@@ -109,13 +109,20 @@ namespace tmp {
   using clone_all_pointers_t = typename clone_all_pointers<From, To>::type;
 
   template<typename From, typename To>
-  using copy_extent = std::conditional<
-    !std::is_array<From>::value,
-    To,
-    typename std::conditional<std::extent<From>::value != 0,
-                              To[std::extent<From>::value != 0 ? std::extent<From>::value : 1],
-                              // the ternary conditional is to prevent To[0] since there is no short circuiting in std::conditional
-                              To[]>::type>;
+  struct copy_extent {
+    static_assert(std::extent<From, 0>::value != 0 && std::extent<To, 0>::value != 0,
+                  "To shall not be an array of unknown bound along its"
+                  "\nfirst dimension if From is an array of unknown bound along its"
+                  "\nfirst dimension.");
+
+    using type = typename std::conditional<
+      !std::is_array<From>::value,
+      To,
+      typename std::conditional<(std::rank<From>::value != 0 && std::extent<From, 0>::value != 0),
+                                To[std::extent<From,0>::value != 0 ? std::extent<From,0>::value : 1],
+                                // the ternary conditional is to prevent To[0] since there is no short circuiting in std::conditional
+                                To[]>::type>::type;
+  };
 
   template<typename From, typename To>
   using copy_extent_t = typename copy_extent<From, To>::type;
@@ -123,7 +130,7 @@ namespace tmp {
   template<typename From, typename To>
   struct copy_all_extents :
   std::conditional<(std::rank<From>::value > 0),
-                   copy_all_extents<typename std::extent<From>::type, typename copy_extent<From, To>::type>,
+                   copy_all_extents<typename std::remove_extent<From>::type, typename copy_extent<From, To>::type>,
                    type_identity<To>>::type {};
 
   template<typename From, typename To>

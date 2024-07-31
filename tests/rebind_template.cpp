@@ -13,11 +13,3 @@ IS_SAME(FloatAllocator, std::allocator<float>);
 IS_SAME(Rebound, TwoArgs<char,wchar_t>);
 
 
-template<typename T0>
-void f();
-template<auto V0>
-void f();
-template<typename T0,auto V0>
-void f();
-template<auto V0,typename T0>
-void f();

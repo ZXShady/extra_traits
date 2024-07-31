@@ -53,20 +53,20 @@ namespace tmp {
         using type = ::zxshady::tmp::type_list<Ts...>;
       };
 
-      template<typename, template<typename> class>
+      template<typename, template<typename...> class>
       struct erase_if;
 
-      template<template<typename> class Predicate>
+      template<template<typename...> class Predicate>
       struct erase_if<::zxshady::tmp::type_list<>, Predicate> {
         using type = ::zxshady::tmp::type_list<>;
       };
 
-      template<typename T, template<typename> class Predicate>
+      template<typename T, template<typename...> class Predicate>
       struct erase_if<::zxshady::tmp::type_list<T>, Predicate> {
         using type = typename std::conditional<!!Predicate<T>::value, ::zxshady::tmp::type_list<>, ::zxshady::tmp::type_list<T>>::type;
       };
 
-      template<typename T, typename... Ts, template<typename> class Predicate>
+      template<typename T, typename... Ts, template<typename...> class Predicate>
       struct erase_if<::zxshady::tmp::type_list<T, Ts...>, Predicate> {
         using type = typename std::conditional<
           !!Predicate<T>::value,
@@ -82,13 +82,23 @@ namespace tmp {
   }   // namespace details
 
 
+  template<typename, typename...>
+  struct type_list_front_and_back {};
+
+  template<typename Base, typename T, typename... Types>
+  struct type_list_front_and_back<Base, T, Types...> {
+    using front = T;
+    using back  = typename details::type_list::at_check_bounds<
+      sizeof...(Types) != 0 ? sizeof...(Types)-1 : 0,
+      decltype(details::type_list::make_types_with_index<Types...>(make_index_sequence<sizeof...(Types)>()))>::type;
+  };
+
   template<typename... Types>
-  struct type_list {
+  struct type_list : type_list_front_and_back<type_list<Types...>, Types...> {
     static constexpr std::size_t size     = sizeof...(Types);
     static constexpr std::size_t is_empty = (size == 0);
     using types_with_index                = decltype(details::type_list::make_types_with_index<Types...>(
       make_index_sequence<sizeof...(Types)>()));
-
 
     template<std::size_t Begin, std::size_t End = sizeof...(Types)>
     using slice = decltype(details::type_list::slice<Begin, type_list>(make_index_sequence<End - Begin>()));
@@ -103,8 +113,6 @@ namespace tmp {
     using at_or = typename std::
       conditional<(Index < size), decltype(details::type_list::get_type_by_index<Index>(std::declval<types_with_index>())), OrType>::type;
 
-    using front = at<0>;
-    using back  = at<(is_empty ? 0 : size - 1)>;
 
     template<typename T>
     using push_back = type_list<Types..., T>;
@@ -141,7 +149,7 @@ namespace tmp {
     using drop_last = slice<0, size - Count>;
 
     template<std::size_t Index, typename T>
-    using replace_at = decltype(slice<0, Index>{} + type_list<T>{});
+    using replace_at = decltype(slice<0, Index>{} + type_list<T>{} + slice<Index + 1>{});
 
     template<template<typename> class TransformTrait>
     using transform = type_list<typename TransformTrait<Types>::type...>;
@@ -194,7 +202,7 @@ namespace tmp {
     template<std::size_t Pos>
     using erase = decltype(erase_impl<Pos>(make_index_sequence<Pos>(), make_index_sequence<size - Pos - 1>()));
 
-    template<template<typename> class UnaryPredicate>
+    template<template<typename...> class UnaryPredicate>
     using erase_if = typename details::type_list::erase_if<type_list, UnaryPredicate>::type;
   };
 
@@ -218,17 +226,27 @@ namespace tmp {
 #endif
   }
 
+  template<typename Find, std::size_t Pos = 0>
+  constexpr std::size_t find(type_list<>) noexcept
+  {
+    return static_cast<std::size_t>(-1);
+  }
   template<typename Find, std::size_t Pos = 0, typename... Ts>
   constexpr std::size_t find(type_list<Ts...>) noexcept
   {
-    return type_list<Ts...>::template find_impl<Pos,ZXSHADY_BIND_TEMPLATE(std::is_same, Find)>(
-      make_index_sequence<sizeof...(Ts) - Pos>());
+    return (Pos >= sizeof...(Ts))
+      ? static_cast<std::size_t>(-1)
+      : type_list<Ts...>::template find_impl<((Pos < sizeof...(Ts)) ? Pos : 0), ZXSHADY_BIND_TEMPLATE(std::is_same, Find)>(
+          make_index_sequence<sizeof...(Ts) - (Pos < sizeof...(Ts) ? Pos : 0)>());
   }
 
   template<template<typename...> class UnaryPredicate, std::size_t Pos = 0, typename... Ts>
   constexpr std::size_t find_if(type_list<Ts...>) noexcept
   {
-    return type_list<Ts...>::template find_impl<Pos, UnaryPredicate>(make_index_sequence<sizeof...(Ts) - Pos>());
+    return (Pos >= sizeof...(Ts))
+      ? static_cast<std::size_t>(-1)
+      : type_list<Ts...>::template find_impl<((Pos < sizeof...(Ts)) ? Pos : 0), UnaryPredicate>(
+          make_index_sequence<sizeof...(Ts) - (Pos < sizeof...(Ts) ? Pos : 0)>());
   }
 
 
