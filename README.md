@@ -363,6 +363,7 @@ static_assert(std::is_same_v<char,List::template at<1>>);
 <summary>at_or&ltIndex,OrType&gt</summary>
 index into the types from the list. if the index is out of bounds
 then returns the OrType instead of failing.
+
 ```cpp
 using List = type_list<int,char,long>;
 static_assert(std::is_same_v<long,List::template at_or<2,void>>); 
@@ -372,7 +373,7 @@ static_assert(std::is_same_v<void,List::template at_or<5,void>>);
 
 <p id="front"></p><details>
 <summary>front</summary>
-equal to `List::template at<0>`
+equal to `List::template at&lt0&gt`
 
 ```cpp
 using List = type_list<int,char,long>;
@@ -383,7 +384,7 @@ static_assert(std::is_same_v<int,List::front>);
 
 <p id="back"></p><details>
 <summary>back</summary>
-equal to `List::template at<size-1>`
+equal to `List::template at&ltsize-1&gt`
 
 ```cpp
 using List = type_list<int,char,long>;

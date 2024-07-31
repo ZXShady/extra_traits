@@ -119,7 +119,7 @@ namespace tmp {
       !std::is_array<From>::value,
       To,
       typename std::conditional<(std::rank<From>::value != 0 && std::extent<From, 0>::value != 0),
-                                To[std::extent<From,0>::value != 0 ? std::extent<From,0>::value : 1],
+                                To[std::extent<From, 0>::value != 0 ? std::extent<From, 0>::value : 1],
                                 // the ternary conditional is to prevent To[0] since there is no short circuiting in std::conditional
                                 To[]>::type>::type;
   };
@@ -146,6 +146,10 @@ namespace tmp {
   struct copy_signedness {
     static_assert(std::is_enum<To>::value || std::is_integral<To>::value, "To must be an enum or integral type");
     static_assert(std::is_enum<From>::value || std::is_integral<From>::value, "From must be an enum or integral type");
+    static_assert(!std::is_same<typename std::remove_cv<To>::type, bool>::value,
+                  "To must not be a possibility cv qualified 'bool'");
+    static_assert(!std::is_same<typename std::remove_cv<From>::type, bool>::value,
+                  "From must not be a possibility cv qualified 'bool'");
 
     using type = typename std::conditional<
       std::is_same<From, typename std::make_signed<From>::type>::value,
