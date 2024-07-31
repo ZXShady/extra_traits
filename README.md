@@ -352,6 +352,7 @@ static_assert(List2::is_empty);
 <summary>at&ltIndex&gt</summary>
 index into the types from the list.
 if the index is out of bounds a `static_assert` will fire.
+
 ```cpp
 using List = type_list<int,char,long>;
 static_assert(std::is_same_v<char,List::template at<1>>);
@@ -594,11 +595,11 @@ static_assert(std::is_same_v<List::template replace_at<2,void>, type_list<int,ch
 *note* returns std::size_t(-1) on not found 
 
 ```cpp
-using List = type_list<int,char,long>;
+using List = type_list<int,char,const long,volatile void>;
 
 
-static_assert(find<void>(List{}) == std::size_t(-1));
-static_assert(find<char>(List{})== 1);
+static_assert(find_if<std::is_const>(List{}) == 2);
+static_assert(find_if<std::is_void>(List{}) == 3);
 
 ```
 </details>
@@ -611,9 +612,8 @@ static_assert(find<char>(List{})== 1);
 using List = type_list<int,char,long>;
 
 
-static_assert(std::is_same_v<List::template replace_at<0,void>, type_list<void,char,long>>);
-static_assert(std::is_same_v<List::template replace_at<1,void>, type_list<int,void,long>>);
-static_assert(std::is_same_v<List::template replace_at<2,void>, type_list<int,char,void>>);
+static_assert(find<void>(List{}) == std::size_t(-1));
+static_assert(find<char>(List{}) == 1);
 
 ```
 </details>
