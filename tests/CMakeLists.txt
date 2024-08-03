@@ -6,7 +6,14 @@ target_link_libraries(tests ZXShady::ExtraTraits)
 if(MSVC)
   target_compile_options(tests PRIVATE /Za /permissive-)
 endif()
-target_compile_features(tests PRIVATE cxx_std_11)
+target_compile_features(tests PRIVATE cxx_std_20)
+
+if(MSVC)
+  target_compile_options(tests PRIVATE /W4)
+else()
+  target_compile_options(tests PRIVATE -Wall -Wextra -Wconversion)
+endif()
+
 
 
 target_sources(tests PRIVATE
@@ -22,6 +29,7 @@ target_sources(tests PRIVATE
   copy_reference.cpp
   copy_signedness.cpp
   disjunction.cpp
+  logical_traits.cpp
   # inherit_if.cpp
   is_bounded_array.cpp
   is_braces_constructible.cpp
@@ -38,6 +46,7 @@ target_sources(tests PRIVATE
   remove_all_pointers.cpp
   remove_cvref.cpp
   type_list.cpp
+  least_size_int.cpp
   has_operator/plus.cpp
   test.hpp
 )

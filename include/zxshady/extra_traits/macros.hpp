@@ -3,14 +3,6 @@
 
 #include <type_traits>
 
-#ifndef ZXSHADY_INLINE_VAR
-#ifdef __cpp_inline_variables
-#define ZXSHADY_INLINE_VAR inline
-#else
-#define ZXSHADY_INLINE_VAR
-#endif
-#endif
-
 #ifdef __cpp_concepts
 namespace zxshady {
 namespace tmp {

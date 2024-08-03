@@ -1,6 +1,7 @@
 #ifndef ZXSHADY_EXTRA_TRAITS_TYPE_LIST_HPP
 #define ZXSHADY_EXTRA_TRAITS_TYPE_LIST_HPP
 
+#include "logical_traits.hpp"
 #include "standard_library_features.hpp"
 #include "utility.hpp"
 
@@ -12,15 +13,24 @@ namespace tmp {
   template<typename...>
   struct type_list;
 
+  template<typename... Ts, typename... Us>
+  constexpr type_list<Ts..., Us...> operator+(type_list<Ts...>, type_list<Us...>);
+
   namespace details {
     namespace type_list {
-
-      template<std::size_t Index, typename T>
-      struct type_with_index {
-        static constexpr std::size_t index = Index;
-        using type                         = T;
+      template<std::size_t N, typename T>
+      struct repeat_n {
+        using repeated = typename repeat_n<N / 2, T>::type;
+        using type     = decltype(repeated{} + repeated{} + typename repeat_n<N % 2, T>::type());
       };
-
+      template<typename T>
+      struct repeat_n<0, T> {
+        using type = ::zxshady::tmp::type_list<>;
+      };
+      template<typename T>
+      struct repeat_n<1, T> {
+        using type = ::zxshady::tmp::type_list<T>;
+      };
       // why not just return T
       // because if T is a const / volatile / cv qualified fundemintal type
       // it will drop the qualifiers
@@ -35,7 +45,7 @@ namespace tmp {
 
 
       template<typename... Ts, std::size_t... Is>
-      inherit_from_all<type_with_index<Is, Ts>...> make_types_with_index(index_sequence<Is...>);
+      inherit_from<type_with_index<Is, Ts>...> make_types_with_index(index_sequence<Is...>);
 
       template<std::size_t Index, typename TypesWithIndex>
       struct at_check_bounds {
@@ -77,191 +87,177 @@ namespace tmp {
       template<std::size_t Offset, typename List, std::size_t... Is>
       ::zxshady::tmp::type_list<typename List::template at<(Offset + Is)>...> slice(index_sequence<Is...>);
 
+  } // namespace type_list
+} // namespace details
 
-    } // namespace type_list
-  }   // namespace details
+template<typename, typename...>
+struct type_list_front_and_back {};
 
+template<typename Base, typename T, typename... Types>
+struct type_list_front_and_back<Base, T, Types...> {
+  using front = T;
+  using back  = typename details::type_list::at_check_bounds<
+    sizeof...(Types) != 0 ? sizeof...(Types) - 1 : 0,
+    decltype(details::type_list::make_types_with_index<Types...>(make_index_sequence<sizeof...(Types)>()))>::type;
+};
 
-  template<typename, typename...>
-  struct type_list_front_and_back {};
+template<typename... Types>
+struct type_list : type_list_front_and_back<type_list<Types...>, Types...> {
 
-  template<typename Base, typename T, typename... Types>
-  struct type_list_front_and_back<Base, T, Types...> {
-    using front = T;
-    using back  = typename details::type_list::at_check_bounds<
-      sizeof...(Types) != 0 ? sizeof...(Types)-1 : 0,
-      decltype(details::type_list::make_types_with_index<Types...>(make_index_sequence<sizeof...(Types)>()))>::type;
-  };
+  static constexpr std::size_t npos     = static_cast<std::size_t>(-1);
+  static constexpr std::size_t size     = sizeof...(Types);
+  static constexpr std::size_t is_empty = (size == 0);
+  using types_with_index                = decltype(details::type_list::make_types_with_index<Types...>(
+    make_index_sequence<sizeof...(Types)>()));
 
-  template<typename... Types>
-  struct type_list : type_list_front_and_back<type_list<Types...>, Types...> {
-    static constexpr std::size_t size     = sizeof...(Types);
-    static constexpr std::size_t is_empty = (size == 0);
-    using types_with_index                = decltype(details::type_list::make_types_with_index<Types...>(
-      make_index_sequence<sizeof...(Types)>()));
-
-    template<std::size_t Begin, std::size_t End = sizeof...(Types)>
-    using slice = decltype(details::type_list::slice<Begin, type_list>(make_index_sequence<End - Begin>()));
-
-
-    template<std::size_t Index>
-    using at = typename details::type_list::at_check_bounds<(Index < size ? Index : static_cast<std::size_t>(-1)),
-                                                            types_with_index>::type;
+  template<std::size_t Begin, std::size_t End = sizeof...(Types)>
+  using slice = decltype(details::type_list::slice<Begin, type_list>(make_index_sequence<End - Begin>()));
 
 
-    template<std::size_t Index, typename OrType>
-    using at_or = typename std::
-      conditional<(Index < size), decltype(details::type_list::get_type_by_index<Index>(std::declval<types_with_index>())), OrType>::type;
+  template<std::size_t Index>
+  using at = typename details::type_list::at_check_bounds<(Index < size ? Index : static_cast<std::size_t>(-1)), types_with_index>::type;
 
 
-    template<typename T>
-    using push_back = type_list<Types..., T>;
-
-    template<typename T>
-    using push_front = type_list<T, Types...>;
-
-    template<typename... Us>
-    using append = type_list<Types..., Us...>;
-
-    template<typename... Us>
-    using prepend = type_list<Us..., Types...>;
+  template<std::size_t Index, typename OrType>
+  using at_or = typename std::
+    conditional<(Index < size), decltype(details::type_list::get_type_by_index<Index>(std::declval<types_with_index>())), OrType>::type;
 
 
-    template<std::size_t... Is>
-    static type_list<at<(size - Is - 1)>...> reverse_impl(index_sequence<Is...>);
+  template<std::size_t... Is>
+  static type_list<at<(size - Is - 1)>...> reverse_impl(index_sequence<Is...>);
 
-    template<std::size_t... Is>
-    static type_list<at<Is>...> pop_front_impl(index_sequence<Is...>);
+  template<std::size_t... Is>
+  static type_list<at<Is>...> pop_front_impl(index_sequence<Is...>);
 
-    template<typename T, typename... Ts>
-    static type_list<Ts...> pop_back_impl(const type_list<T, Ts...>&);
+  template<typename T, typename... Ts>
+  static type_list<Ts...> pop_back_impl(const type_list<T, Ts...>&);
 
-    using reverse = decltype(reverse_impl(make_index_sequence<size>()));
+  using reverse = decltype(reverse_impl(make_index_sequence<size>()));
 
-    using pop_front = typename details::type_list::pop_front<Types...>::type;
+  using pop_front = typename details::type_list::pop_front<Types...>::type;
 
-    using pop_back = decltype(pop_front_impl(make_index_sequence<(!is_empty ? size - 1 : 0)>()));
+  using pop_back = decltype(pop_front_impl(make_index_sequence<(!is_empty ? size - 1 : 0)>()));
 
-    template<std::size_t Count>
-    using drop_first = slice<Count>;
+  template<std::size_t Count>
+  using drop_first = slice<Count>;
 
-    template<std::size_t Count>
-    using drop_last = slice<0, size - Count>;
+  template<std::size_t Count>
+  using drop_last = slice<0, size - Count>;
 
-    template<std::size_t Index, typename T>
-    using replace_at = decltype(slice<0, Index>{} + type_list<T>{} + slice<Index + 1>{});
+  template<std::size_t Index, typename T>
+  using replace_at = decltype(slice<0, Index>{} + type_list<T>{} + slice<Index + 1>{});
 
-    template<template<typename> class TransformTrait>
-    using transform = type_list<typename TransformTrait<Types>::type...>;
+  template<template<typename> class TransformTrait>
+  using transform = type_list<typename TransformTrait<Types>::type...>;
 
-    template<template<typename...> class To, typename... A1, typename... A2, typename... A3>
-    static To<A1..., A2..., A3...> rename_to_impl(type_list<A1...>&&, type_list<A2...>&&, type_list<A3...>&&);
-
-
-    template<template<typename...> class To, typename BeforeArgsTypeList = type_list<>, typename AfterArgsTypeList = type_list<>>
-    using rename_to = decltype(rename_to_impl<To>(std::declval<BeforeArgsTypeList>(),
-                                                  std::declval<type_list<Types...>>(),
-                                                  std::declval<AfterArgsTypeList>()));
+  template<template<typename...> class To>
+  using rename_to = To<Types...>;
 
 
-    template<typename... Us, std::size_t... FrontIs, std::size_t... BackIs>
-    static type_list<at<FrontIs>..., Us..., at<(sizeof...(FrontIs) + BackIs)>...> insert_impl(index_sequence<FrontIs...>,
-                                                                                              index_sequence<BackIs...>);
-    //   0     1    2
-    // int,short,char
-    //
-    template<std::size_t Pos, std::size_t... FrontIs, std::size_t... BackIs>
-    static type_list<at<(FrontIs)>..., at<(sizeof...(FrontIs) + BackIs + 1)>...> erase_impl(index_sequence<FrontIs...>,
+  template<typename... Us, std::size_t... FrontIs, std::size_t... BackIs>
+  static type_list<at<FrontIs>..., Us..., at<(sizeof...(FrontIs) + BackIs)>...> insert_impl(index_sequence<FrontIs...>,
                                                                                             index_sequence<BackIs...>);
+  //   0     1    2
+  // int,short,char
+  //
+  template<std::size_t Pos, std::size_t... FrontIs, std::size_t... BackIs>
+  static type_list<at<(FrontIs)>..., at<(sizeof...(FrontIs) + BackIs + 1)>...> erase_impl(index_sequence<FrontIs...>,
+                                                                                          index_sequence<BackIs...>);
 
 
 
 
 
 
-  public:
-    // clang-format off
+public:
+  // clang-format off
     template<std::size_t Pos,typename... Us>
     using insert = decltype(type_list::template insert_impl<Us...>(
             make_index_sequence<Pos>(),
             make_index_sequence<size - Pos>()
         ));
-    // clang-format on
+  // clang-format on
 
-    template<std::size_t Pos, template<typename...> class UnaryPredicate, std::size_t... Is>
-    static constexpr std::size_t find_impl(index_sequence<Is...>)
-    {
-      // explicitly using my version to work around MSVC BUG!
-      // refer to standard_library_features.hpp
-      return zxshady::tmp::disjunction<
-               std::integral_constant<std::size_t, !!UnaryPredicate<at<(Pos + Is)>>::value ? (Pos + Is + 1) : 0>...>::value -
-        1;
-    }
-
-
-    template<std::size_t Pos>
-    using erase = decltype(erase_impl<Pos>(make_index_sequence<Pos>(), make_index_sequence<size - Pos - 1>()));
-
-    template<template<typename...> class UnaryPredicate>
-    using erase_if = typename details::type_list::erase_if<type_list, UnaryPredicate>::type;
-  };
-
-  template<template<typename...> class UnaryPredicate, typename... Ts>
-  constexpr bool all_of(type_list<Ts...>)
+  template<std::size_t Pos, template<typename...> class UnaryPredicate, std::size_t... Is>
+  static constexpr std::size_t find_impl(index_sequence<Is...>)
   {
+    // explicitly using my version to work around MSVC BUG!
+    // refer to standard_library_features.hpp
+    return zxshady::tmp::disjunction<
+             std::integral_constant<std::size_t, !!UnaryPredicate<at<(Pos + Is)>>::value ? (Pos + Is + 1) : 0>...>::value -
+      1;
+  }
+
+
+  template<std::size_t Pos>
+  using erase = decltype(erase_impl<Pos>(make_index_sequence<Pos>(), make_index_sequence<size - Pos - 1>()));
+
+  template<template<typename...> class UnaryPredicate>
+  using erase_if = typename details::type_list::erase_if<type_list, UnaryPredicate>::type;
+};
+
+template<template<typename...> class UnaryPredicate, typename... Ts>
+constexpr bool all_of(type_list<Ts...>)
+{
 #if defined(__cpp_fold_expressions)
-    return (UnaryPredicate<Ts>::value && ...);
+  return (UnaryPredicate<Ts>::value && ...);
 #else
-    return conjunction<UnaryPredicate<Ts>...>::value;
+  return and_<!!UnaryPredicate<Ts>::value...>::value;
 #endif
-  }
+}
 
-  template<template<typename...> class UnaryPredicate, typename... Ts>
-  constexpr bool any_of(type_list<Ts...>)
-  {
+template<template<typename...> class UnaryPredicate, typename... Ts>
+constexpr bool any_of(type_list<Ts...>)
+{
 #if defined(__cpp_fold_expressions)
-    return (UnaryPredicate<Ts>::value || ...);
+  return (UnaryPredicate<Ts>::value || ...);
 #else
-    return disjunction<UnaryPredicate<Ts>...>::value;
+  return or_<!!UnaryPredicate<Ts>::value...>::value;
 #endif
-  }
+}
 
-  template<typename Find, std::size_t Pos = 0>
-  constexpr std::size_t find(type_list<>) noexcept
-  {
-    return static_cast<std::size_t>(-1);
-  }
-  template<typename Find, std::size_t Pos = 0, typename... Ts>
-  constexpr std::size_t find(type_list<Ts...>) noexcept
-  {
-    return (Pos >= sizeof...(Ts))
-      ? static_cast<std::size_t>(-1)
-      : type_list<Ts...>::template find_impl<((Pos < sizeof...(Ts)) ? Pos : 0), ZXSHADY_BIND_TEMPLATE(std::is_same, Find)>(
-          make_index_sequence<sizeof...(Ts) - (Pos < sizeof...(Ts) ? Pos : 0)>());
-  }
+template<typename Find, std::size_t Pos = 0>
+constexpr std::size_t find(type_list<>) noexcept
+{
+  return static_cast<std::size_t>(-1);
+}
+template<typename Find, std::size_t Pos = 0, typename... Ts>
+constexpr std::size_t find(type_list<Ts...>) noexcept
+{
+  return (Pos >= sizeof...(Ts))
+    ? static_cast<std::size_t>(-1)
+    : type_list<Ts...>::template find_impl<((Pos < sizeof...(Ts)) ? Pos : 0), ZXSHADY_BIND_TEMPLATE(std::is_same, Find)>(
+        make_index_sequence<sizeof...(Ts) - (Pos < sizeof...(Ts) ? Pos : 0)>());
+}
 
-  template<template<typename...> class UnaryPredicate, std::size_t Pos = 0, typename... Ts>
-  constexpr std::size_t find_if(type_list<Ts...>) noexcept
-  {
-    return (Pos >= sizeof...(Ts))
-      ? static_cast<std::size_t>(-1)
-      : type_list<Ts...>::template find_impl<((Pos < sizeof...(Ts)) ? Pos : 0), UnaryPredicate>(
-          make_index_sequence<sizeof...(Ts) - (Pos < sizeof...(Ts) ? Pos : 0)>());
-  }
+template<template<typename...> class UnaryPredicate, std::size_t Pos = 0, typename... Ts>
+constexpr std::size_t find_if(type_list<Ts...>) noexcept
+{
+  return (Pos >= sizeof...(Ts))
+    ? static_cast<std::size_t>(-1)
+    : type_list<Ts...>::template find_impl<((Pos < sizeof...(Ts)) ? Pos : 0), UnaryPredicate>(
+        make_index_sequence<sizeof...(Ts) - (Pos < sizeof...(Ts) ? Pos : 0)>());
+}
 
 
-  template<typename T, typename... Ts>
-  constexpr bool contains(type_list<Ts...>)
-  {
+template<std::size_t N, typename T>
+using type_list_repeat_n = typename details::type_list::repeat_n<N, T>::type;
+
+template<typename T, typename... Ts>
+constexpr bool contains(type_list<Ts...>)
+{
 #if defined(__cpp_fold_expressions)
-    return (std::is_same<T, Ts>::value || ...);
+  return (std::is_same<T, Ts>::value || ...);
 #else
-    return disjunction<std::is_same<T, Ts>...>::value;
+  return or_<std::is_same<T, Ts>::value...>::value;
 #endif
-  }
+}
 
-  template<typename... Ts, typename... Us>
-  type_list<Ts..., Us...> operator+(type_list<Ts...>, type_list<Us...>);
+template<typename... Ts, typename... Us>
+constexpr type_list<Ts..., Us...> operator+(type_list<Ts...>, type_list<Us...>)
+{
+  return {};
+}
 
 } // namespace tmp
 } // namespace zxshady

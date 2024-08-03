@@ -18,7 +18,6 @@ target_include_directories(zxshady_extra_traits INTERFACE
 )
 
 
-
 option(ZXSHADY_EXTRA_TRAITS_BUILD_TESTS "Static tests for this type traits library" OFF)
 
 if(ZXSHADY_EXTRA_TRAITS_BUILD_TESTS)

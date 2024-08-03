@@ -121,40 +121,65 @@ COPY_CV(const&,          &,&);
 COPY_CV(volatile&,       &,&);
 COPY_CV(const volatile&, &,&);
 
-COPY_CV(const&, & , &);
-COPY_CV(const&, & , &);
-COPY_CV(const&, & , &);
-COPY_CV(const&, & , &);
+COPY_CV(&,               const&,const&);
+COPY_CV(const&,          const&,const&);
+COPY_CV(volatile&,       const&,const&);
+COPY_CV(const volatile&, const&,const&);
 
-COPY_CV(volatile&, & , &);
-COPY_CV(volatile&, & , &);
-COPY_CV(volatile&, & , &);
-COPY_CV(volatile&, & , &);
+COPY_CV(&,               volatile&,volatile&);
+COPY_CV(const&,          volatile&,volatile&);
+COPY_CV(volatile&,       volatile&,volatile&);
+COPY_CV(const volatile&, volatile&,volatile&);
 
-COPY_CV(const volatile&, & , &);
-COPY_CV(const volatile&, & , &);
-COPY_CV(const volatile&, & , &);
-COPY_CV(const volatile&, & , &);
+COPY_CV(&,               const volatile&,const volatile&);
+COPY_CV(const&,          const volatile&,const volatile&);
+COPY_CV(volatile&,       const volatile&,const volatile&);
+COPY_CV(const volatile&, const volatile&,const volatile&);
 
-COPY_CV(&&, &&,&&);
-COPY_CV(&&, &&,&&);
-COPY_CV(&&, &&,&&);
-COPY_CV(&&, &&,&&);
 
-COPY_CV(const&&, &&,&&);
-COPY_CV(const&&, &&,&&);
-COPY_CV(const&&, &&,&&);
-COPY_CV(const&&, &&,&&);
+COPY_CV(&&,               &,&);
+COPY_CV(const&&,          &,&);
+COPY_CV(volatile&&,       &,&);
+COPY_CV(const volatile&&, &,&);
 
-COPY_CV(volatile&&, &&,&&);
-COPY_CV(volatile&&, &&,&&);
-COPY_CV(volatile&&, &&,&&);
-COPY_CV(volatile&&, &&,&&);
+COPY_CV(&&,               const&,const&);
+COPY_CV(const&&,          const&,const&);
+COPY_CV(volatile&&,       const&,const&);
+COPY_CV(const volatile&&, const&,const&);
 
+COPY_CV(&&,               volatile&,volatile&);
+COPY_CV(const&&,          volatile&,volatile&);
+COPY_CV(volatile&&,       volatile&,volatile&);
+COPY_CV(const volatile&&, volatile&,volatile&);
+
+COPY_CV(&&,               const volatile&,const volatile&);
+COPY_CV(const&&,          const volatile&,const volatile&);
+COPY_CV(volatile&&,       const volatile&,const volatile&);
+COPY_CV(const volatile&&, const volatile&,const volatile&);
+
+
+COPY_CV(&&,               &&,&&);
+COPY_CV(const&&,          &&,&&);
+COPY_CV(volatile&&,       &&,&&);
 COPY_CV(const volatile&&, &&,&&);
-COPY_CV(const volatile&&, &&,&&);
-COPY_CV(const volatile&&, &&,&&);
-COPY_CV(const volatile&&, &&,&&);
+
+COPY_CV(&&,               const&&,const&&);
+COPY_CV(const&&,          const&&,const&&);
+COPY_CV(volatile&&,       const&&,const&&);
+COPY_CV(const volatile&&, const&&,const&&);
+
+COPY_CV(&&,               volatile&&,volatile&&);
+COPY_CV(const&&,          volatile&&,volatile&&);
+COPY_CV(volatile&&,       volatile&&,volatile&&);
+COPY_CV(const volatile&&, volatile&&,volatile&&);
+
+COPY_CV(&&,               const volatile&&,const volatile&&);
+COPY_CV(const&&,          const volatile&&,const volatile&&);
+COPY_CV(volatile&&,       const volatile&&,const volatile&&);
+COPY_CV(const volatile&&, const volatile&&,const volatile&&);
+
+
+
 
 
 // clang-format on

@@ -25,7 +25,6 @@
 *.la
 *.a
 *.lib
-
 # Executables
 *.exe
 *.out
@@ -38,10 +37,13 @@
 *.vcxproj.filters
 *.sln 
 
+cmake_install.cmake
 .cache/
 
 Debug/
 build/
+include/
+!include/zxshady
 build_Clang/
 build_GCC/
 

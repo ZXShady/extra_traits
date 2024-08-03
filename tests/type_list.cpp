@@ -24,22 +24,22 @@ IS_SAME(List::template replace_at<0, void>, type_list<void,char, wchar_t>);
 IS_SAME(List::template replace_at<1,void>, type_list<int,void,wchar_t>);
 IS_SAME(List::template replace_at<2,void>, type_list<int,char,void>);
 
-IS_SAME(List::template append<int, float>::template slice<2>, type_list<wchar_t, int, float>);
+IS_SAME(decltype(List{} + type_list<int, float>{})::template slice<2>, type_list<wchar_t, int, float>);
 
-IS_SAME(List::template append<int, float>::template drop_first<2>, type_list<wchar_t, int, float>);
-IS_SAME(List::template append<int, float>::template drop_last<2>, type_list<int,char,wchar_t>);
+IS_SAME(decltype(List{} + type_list<int, float>{})::template drop_first<2>, type_list<wchar_t, int, float>);
+IS_SAME(decltype(List{} + type_list<int, float>{})::template drop_last<2>, type_list<int,char,wchar_t>);
 
-IS_SAME(List::template push_back<float>, type_list<int,char,wchar_t, float>);
-IS_SAME(List::template push_front<float>, type_list<float,int, char, wchar_t>);
+IS_SAME(decltype(List{} + type_list<float>{}), type_list<int,char,wchar_t, float>);
+IS_SAME(decltype(type_list<float>{} + List{}), type_list<float,int, char, wchar_t>);
 
-IS_SAME(List::template append<float, double>, type_list<int, char, wchar_t, float, double>);
-IS_SAME(List::template prepend<float, double>, type_list<float, double, int, char, wchar_t>);
+IS_SAME(decltype(List{} + type_list<float, double>{}), type_list<int, char, wchar_t, float, double>);
+IS_SAME(decltype(type_list<float, double>{} + List{}), type_list<float, double, int, char, wchar_t>);
 IS_SAME(List::template insert<1, void*, long>, type_list<int, void*, long, char, wchar_t>);
 
 IS_SAME(List::template erase<1>, type_list<int, wchar_t>);
 IS_SAME(List::template transform<std::add_const>, type_list<const int, const char, const wchar_t>);
 
-using BigList = List::template append<const void*const,long int>;
+using BigList = decltype(List{} + type_list<const void*const,long int>{});
 
 IS_SAME(BigList::template slice<2>, type_list<wchar_t, const void*const, long>);
 
@@ -48,12 +48,16 @@ IS_SAME(BigList::template drop_first<2>, type_list<wchar_t, const void*const, lo
 IS_SAME(BigList::template drop_last<2>, type_list<int,char,wchar_t>);
 
 
-STATIC_ASSERT(find<void*>(List::template push_back<void*>{}) == 3);
+STATIC_ASSERT(find<void*>(List{} +type_list<void*>{}) == 3);
 STATIC_ASSERT(find_if<ZXSHADY_BIND_TEMPLATE(std::is_same,void*)>(List{}) == std::size_t(-1));
-STATIC_ASSERT(find_if<std::is_pointer>(List::template push_back<void*>{}) == 3);
-STATIC_ASSERT(find_if<ZXSHADY_PREDICATE_NOT(std::is_pointer)>(List::template push_back<void*>{}) == 0);
+STATIC_ASSERT(find_if<std::is_pointer>(List {} + type_list<void*>{}) == 3);
+STATIC_ASSERT(find_if<ZXSHADY_PREDICATE_NOT(std::is_pointer)>(List {} + type_list<void*>{}) == 0);
 
 STATIC_ASSERT(find<void,5>(List{}) == std::size_t(-1));
+
+IS_SAME(type_list_repeat_n<5, int>, type_list<int, int, int, int, int>);
+IS_SAME(type_list_repeat_n<0, int>, type_list<>);
+IS_SAME(type_list_repeat_n<1, int>, type_list<int>);
 
 template<typename,typename>
 struct Rename {};

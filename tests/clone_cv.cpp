@@ -137,24 +137,24 @@ CLONE_CV(const volatile&, & , &);
 CLONE_CV(const volatile&, & , &);
 
 CLONE_CV(&&, &&,&&);
-CLONE_CV(&&, &&,&&);
-CLONE_CV(&&, &&,&&);
-CLONE_CV(&&, &&,&&);
+CLONE_CV(const&&, &&,&&);
+CLONE_CV(volatile&&, &&,&&);
+CLONE_CV(const volatile&&, &&,&&);
 
-CLONE_CV(const&&, &&,&&);
-CLONE_CV(const&&, &&,&&);
-CLONE_CV(const&&, &&,&&);
-CLONE_CV(const&&, &&,&&);
+CLONE_CV(&&,               const&&,const&&);
+CLONE_CV(const&&,          const&&,const&&);
+CLONE_CV(volatile&&,       const&&,const&&);
+CLONE_CV(const volatile&&, const&&,const&&);
 
-CLONE_CV(volatile&&, &&,&&);
-CLONE_CV(volatile&&, &&,&&);
-CLONE_CV(volatile&&, &&,&&);
-CLONE_CV(volatile&&, &&,&&);
+CLONE_CV(&&,               volatile&&,volatile&&);
+CLONE_CV(const&&,          volatile&&,volatile&&);
+CLONE_CV(volatile&&,       volatile&&,volatile&&);
+CLONE_CV(const volatile&&, volatile&&,volatile&&);
 
-CLONE_CV(const volatile&&, &&,&&);
-CLONE_CV(const volatile&&, &&,&&);
-CLONE_CV(const volatile&&, &&,&&);
-CLONE_CV(const volatile&&, &&,&&);
+CLONE_CV(&&,               const volatile&&,const volatile&&);
+CLONE_CV(const&&,          const volatile&&,const volatile&&);
+CLONE_CV(volatile&&,       const volatile&&,const volatile&&);
+CLONE_CV(const volatile&&, const volatile&&,const volatile&&);
 
 
 // clang-format on

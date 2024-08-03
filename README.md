@@ -4,10 +4,12 @@ simple library for some missing type traits I always need when making unreadable
 
 Minimum C++11 with support for variadic macros and variaidc templates and type traits library.
 
-all these are available in namespace `zxshady::tmp` and all type traits have _t and _v shortcuts if available.
+all these are available in namespace `zxshady::tmp` and all type traits have _t unconditionally but it also has _v shortcuts if available. 
 
 
 has_operator_*
+
+each of these has their own header for minimizing includes you can look at the file names at `include/zxshady/has_operators/`
 
 | Category | Operator |
 |---|---|
@@ -16,7 +18,6 @@ has_operator_*
 | | pre_increment |
 | | post_increment |
 | Unary | dereference |
-| | negate |
 | | complement |
 | | unary_minus |
 | | unary_plus |
@@ -53,7 +54,7 @@ has_operator_*
 | | subscript |
 | | call |
 
-each has_operator_\* has 4 static members
+each has_operator_XXX has 4 static members
 
 ```cpp
 has_operator_XXX<T>::member; // whether it is a member function
@@ -68,6 +69,12 @@ simple type aliases
 
 template<std::size_t Value>
 using index_constant = std::integral_constant<std::size_t,Value>;
+
+template<typename T>
+using alignof_constant = std::integral_constant<std::size_t,alignof(T)>;
+
+template<typename T>
+using sizeof_constant = std::integral_constant<std::size_t,sizeof(T)>;
 
 // this is avaiable in C++17
 template<auto Value> 
@@ -88,6 +95,16 @@ using is_inheritable = bool_constant<std::is_class_v<T> && !std::is_final_v<T> >
 
 template<typename...>
 struct empty_base {};
+
+// does not report true for bool
+template<typename T>
+using is_signed_integral = std::bool_constant<
+!std::is_same_v<bool,std::remove_cv_t<T>> && std::is_integral_v<T> && std::is_signed_v<T>>; 
+
+
+// does not report true for bool
+template<typename T>
+using is_unsigned_integral = std::bool_constant<!std::is_same_v<bool,std::remove_cv_t<T>> && std::is_integral_v<T> && std::is_unsigned_v<T>>; 
 
 ```
 
@@ -130,6 +147,13 @@ utility traits
 
 ```
 
+non-short circuiting `disjunction` and `conjunction` which may result in faster compilation times.
+
+```cpp
+and_<Traits...>::value;
+or_<Traits...>::value;
+
+```
 
 unary traits
 ```cpp
@@ -204,11 +228,23 @@ const volatile From&& -> To
 <p> is a short cut for  <a href="#copy_const">copy_const_t</a>
 &ltFrom,<a href="#copy_volatile">copy_volatile_t</a>&ltFrom,To&gt&gt
 </p>
-
-## copy_cv<From,To>
-<p> is a short cut for  <a href="#copy_const">copy_const_t</a>
-&ltFrom,<a href="#copy_volatile">copy_volatile_t</a>&ltFrom,To&gt&gt
-</p>
+<details>
+<summary>Show Table</summary>
+From                  -> To
+const From            -> const To
+volatile From         -> volatile To
+const volatile From   -> const volatile To
+--------------------------------
+From&                 -> To
+const From&           -> To
+volatile From&        -> To
+const volatile From&  -> To
+--------------------------------
+From&&                -> To
+const From&&          -> To
+volatile From&&       -> To
+const volatile From&& -> To
+</details>
 
 
 
@@ -279,11 +315,92 @@ From**const volatile   -> To**
 ```
 </details>  
 
+<h3 id ="copy_signedness">
+copy_signedness&ltFrom,To&gt 
+</h3>
+<details>
+  <summary>Show Table</summary>
+  
+```cpp
+signed From                  -> signed To
+const signed From            -> signed To
+volatile signed From         -> signed To
+const volatile signed From   -> signed To
+--------------------------------
+unsigned From                  -> unsigned To
+const unsigned From            -> unsigned To
+volatile unsigned From         -> unsigned To
+const volatile unsigned From   -> unsigned To
+--------------------------------
+char                 -> [to's sign does not change] To
+const char           -> [to's sign does not change] To
+volatile char        -> [to's sign does not change] To
+const volatile char  -> [to's sign does not change] To
+
+```
+</details>  
+
+
+### least_size_[u]int<N>
+
+gets the smallest unsigned or signed integer type that can hold this value
+
+<details>
+<summary>Show Example (it can differ depending on the size of types)</summary>
+
+
+```cpp
+least_size_uint_t<200>; // unsigned char
+least_size_int_t<500>; // signed short 
+```
+</details>
 
 
 
 
+### remove_[l|r]value_reference
 
+removes the reference qualifier if it is an L or R value respectivly.
+
+<details>
+<summary>Show Table</summary>
+
+
+```cpp
+typename remove_lvalue_reference<int>::type; // int
+typename remove_lvalue_reference<int&>::type; // int
+typename remove_lvalue_reference<int&&>::type; // int&&
+
+typename remove_rvalue_reference<int>::type; // int
+typename remove_rvalue_reference<int&>::type; // int&
+typename remove_rvalue_reference<int&&>::type; // int
+
+```
+</details>
+
+
+### ZXSHADY_FWD ZXSHADY_MOV macros
+
+the first does a std::forward and the second does std::move, why does these exist? well it is for compile time performance as std::forward is relativly expensive for a glorified `static_cast` these macros fix this issue these macros are in the `extra_traits/macros.hpp` header file.
+
+<details>
+<summary>Show Example</summary>
+
+
+```cpp
+
+[](auto&& vals) {
+std::forward<decltype(vals)>(vals);
+// vs  
+ZXSHADY_FWD(vals)
+
+std::move(vals);
+// vs
+ZXSHADY_MOV(vals);
+}
+
+```
+</details>
 
 <h3 id="is_explicitly_constructible">
 is_explicitly_constructible<T,Args...>
@@ -291,6 +408,7 @@ is_explicitly_constructible<T,Args...>
 tests for whether the type is explicitly constructible given the Args
 
 
+*it also has `is_explicitly_default_constructible<T>`,`is_explicitly_copy_constructible<T>` and `is_explicitly_move_constructible<T>`*
 ```cpp
 using namespace zxshady::tmp;
 
@@ -307,6 +425,7 @@ is_explicitly_constructible<A,char*>::value; // false
 
 the opposite of [is_explicitly_constructible\<T,Args...\>](#is_explicitly_constructible) it checks whether the type is implictly constructible
 
+*it also has `is_implicitly_default_constructible<T>`,`is_implicitly_copy_constructible<T>` and `is_implicitly_move_constructible<T>`*
 ```cpp
 using namespace zxshady::tmp;
 
@@ -375,6 +494,8 @@ static_assert(std::is_same_v<void,List::template at_or<5,void>>);
 <summary>front</summary>
 equal to `List::template at&lt0&gt`
 
+*note this member does not exist if is_empty is true* 
+
 ```cpp
 using List = type_list<int,char,long>;
 static_assert(std::is_same_v<int,List::front>); 
@@ -386,6 +507,8 @@ static_assert(std::is_same_v<int,List::front>);
 <summary>back</summary>
 equal to `List::template at&ltsize-1&gt`
 
+*note this member does not exist if is_empty is true* 
+
 ```cpp
 using List = type_list<int,char,long>;
 static_assert(std::is_same_v<long,List::back>); 
@@ -393,55 +516,17 @@ static_assert(std::is_same_v<long,List::back>);
 </details>
 
 
-<p id="push_back"></p><details>
-<summary>push_back&ltT&gt</summary>
-pushes T into the end of the list like `std::list::push_back`
+<p id="operator_plus"></p><details>
+<summary>operator+</summary>
+does concatenation of 2 lists
 
 ```cpp
-using List = type_list<int,char,long>;
-using NewList = List::template push_back<const char*>;
-static_assert(std::is_same_v<const char*,NewList::back>); 
+using List1 = type_list<int[1],int[2]>;
+using List2 = type_list<int[3],int[4]>;
+static_assert(std::is_same_v<decltype(List1{} + List2{}),type_list&gtint[1],int[2],int[3],int[4]&lt>); 
 ```
 </details>
 
-
-<p id="push_front"></p><details>
-<summary>push_front&ltT&gt</summary>
-pushes T into the front of the list like `std::list::push_front`
-
-```cpp
-using List = type_list<int,char,long>;
-using NewList = List::template push_front<const char*>;
-static_assert(std::is_same_v<const char*,NewList::front>); 
-```
-</details>
-
-
-
-<p id="append"></p><details>
-<summary>append&ltTypes...&gt</summary>
-pushes multiple Types into the end of the list.
-
-```cpp
-using List = type_list<int,char,long>;
-using NewList = List::template append<void,const char*>;
-static_assert(std::is_same_v<const char*,NewList::front>); 
-static_assert(std::is_same_v<void,NewList::template at<3>>); 
-```
-</details>
-
-
-<p id="prepend"></p><details>
-<summary>prepend&ltTypes...&gt</summary>
-pushes multiple Types into the front of the list.
-
-```cpp
-using List = type_list<int,char,long>;
-using NewList = List::template prepend<void,const char*>;
-static_assert(std::is_same_v<void,NewList::back>); 
-static_assert(std::is_same_v<const char*,NewList::template at<1>>); 
-```
-</details>
 
 <p id="reverse"></p><details>
 <summary>reverse</summary>
@@ -614,11 +699,23 @@ using List = type_list<int,char,long>;
 
 
 static_assert(find<void>(List{}) == std::size_t(-1));
-static_assert(find<char>(List{}) == 1);
+static_assert(find<char,0>(List{}) == 1);
 
 ```
 </details>
 
+
+<p id="type_list_repeat_n"></p><details>
+<summary>type_list_repeat_n&ltN,T&gt</summary>
+returns a type_list with N Ts in it
+
+
+```cpp
+IS_SAME(type_list_repeat_n<5, int>, type_list<int, int, int, int, int>);
+IS_SAME(type_list_repeat_n<0, int>, type_list<>);
+IS_SAME(type_list_repeat_n<1, int>, type_list<int>);
+```
+</details>
 
 
 there is still more methods.

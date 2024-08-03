@@ -9,11 +9,13 @@
 
 
 #include "extra_traits/has_operators.hpp"
+#include "extra_traits/least_size_int.hpp"
+#include "extra_traits/literals.hpp"
+#include "extra_traits/logical_traits.hpp"
 #include "extra_traits/macros.hpp"
+#include "extra_traits/qualmanip.hpp"
 #include "extra_traits/standard_library_features.hpp"
 #include "extra_traits/type_list.hpp"
-#include "extra_traits/literals.hpp"
-#include "extra_traits/qualmanip.hpp"
 
 #include <new>
 #include <type_traits>
@@ -22,10 +24,8 @@
 #include <cstddef>
 
 
-
 namespace zxshady {
 namespace tmp {
-
 
 
   template<template<typename> class... UnaryPredicates>
@@ -82,7 +82,7 @@ namespace tmp {
   template<typename T>
   constexpr T& as_lvalue(T&& t) noexcept
   {
-    return (t);
+    return static_cast<T&>(t);
   }
 
   template<typename T>
@@ -102,14 +102,21 @@ namespace tmp {
   void as_cv(const T&&) = delete;
 
 
-  template<std::size_t Value>
-  using index_constant = std::integral_constant<std::size_t, Value>;
-
-#ifdef __cpp_nontype_template_parameter_auto
-  template<auto V>
-  using constant = std::integral_constant<decltype(V), V>;
+  // clang-format off
+  template<typename T>
+  using is_character_type = and_<
+    std::is_same<char,typename std::remove_cv<T>::type>,
+    std::is_same<signed char,typename std::remove_cv<T>::type>,
+    std::is_same<unsigned char,typename std::remove_cv<T>::type>,
+    std::is_same<wchar_t,typename std::remove_cv<T>::type>,
+    std::is_same<char16_t,typename std::remove_cv<T>::type>,
+    std::is_same<char32_t,typename std::remove_cv<T>::type>
+#if __cpp_char8_t
+      ,
+      std::is_same<char8_t,typename std::remove_cv<T>::type>
 #endif
-
+  >;
+  // clang-format on
 
   namespace details {
     template<typename... RebindWith, template<typename...> class Template, typename... TemplateArgs>
@@ -172,16 +179,16 @@ namespace tmp {
 #ifdef __cpp_variable_templates
 
   template<typename T, typename... Args>
-  ZXSHADY_INLINE_VAR constexpr bool is_braces_constructible_v = is_braces_constructible<T, Args...>::value;
+  constexpr bool is_braces_constructible_v = is_braces_constructible<T, Args...>::value;
 
   template<typename T, typename... Args>
-  ZXSHADY_INLINE_VAR constexpr bool is_nothrow_braces_constructible_v = is_nothrow_braces_constructible<T, Args...>::value;
+  constexpr bool is_nothrow_braces_constructible_v = is_nothrow_braces_constructible<T, Args...>::value;
 
   template<typename T, typename... Args>
-  ZXSHADY_INLINE_VAR constexpr bool is_brackets_constructible_v = is_brackets_constructible<T, Args...>::value;
+  constexpr bool is_brackets_constructible_v = is_brackets_constructible<T, Args...>::value;
 
   template<typename T, typename... Args>
-  ZXSHADY_INLINE_VAR constexpr bool is_nothrow_brackets_constructible_v = is_nothrow_brackets_constructible<T, Args...>::value;
+  constexpr bool is_nothrow_brackets_constructible_v = is_nothrow_brackets_constructible<T, Args...>::value;
 
 #endif // __cpp_variable_templates
 
@@ -237,7 +244,7 @@ namespace tmp {
   namespace details {
     template<typename T>
     void implicit_constructibtility_test(T);
-  
+
     template<typename /*always void*/, typename, typename...>
     struct is_implicitly_constructible : ::std::false_type {};
 
@@ -319,8 +326,6 @@ namespace tmp {
 #endif // __cpp_variable_templates
 
 
-  
-
   // the && is to make it when calling it like this forward_like<int>(float); float will become an rvalue
   template<typename Like, typename T>
   constexpr copy_cvref_t<Like&&, T> forward_like(T&& t) noexcept
@@ -355,17 +360,19 @@ namespace tmp {
   using remove_rvalue_reference_t = typename remove_rvalue_reference<T>::type;
 
   template<typename T>
-  using is_signed_integer = bool_constant<std::is_integral<T>::value && std::is_signed<T>::value>;
+  using is_signed_integeral = bool_constant<!std::is_same<bool, typename std::remove_cv<T>::type>::value &&
+                                            std::is_integral<T>::value && std::is_signed<T>::value>;
   template<typename T>
-  using is_unsigned_integer = bool_constant<std::is_integral<T>::value && std::is_unsigned<T>::value>;
+  using is_unsigned_integeral = bool_constant<!std::is_same<bool, typename std::remove_cv<T>::type>::value &&
+                                              std::is_integral<T>::value && std::is_unsigned<T>::value>;
 
 
 #ifdef __cpp_variable_templates
   template<typename T>
-  ZXSHADY_INLINE_VAR constexpr bool is_signed_integer_v = is_signed_integer<T>::value;
+  constexpr bool is_signed_integeral_v = is_signed_integeral<T>::value;
 
   template<typename T>
-  ZXSHADY_INLINE_VAR constexpr bool is_unsigned_integer_v = is_unsigned_integer<T>::value;
+  constexpr bool is_unsigned_integeral_v = is_unsigned_integeral<T>::value;
 #endif
 
   template<typename Enum, typename OrType, bool = std::is_enum<Enum>::value>
@@ -404,16 +411,16 @@ namespace tmp {
 
 #ifdef __cpp_variable_templates
   template<typename T, typename U>
-  ZXSHADY_INLINE_VAR constexpr bool is_same_no_cv_v = is_same_no_cv<T, U>::value;
+  constexpr bool is_same_no_cv_v = is_same_no_cv<T, U>::value;
 
   template<typename T, typename U>
-  ZXSHADY_INLINE_VAR constexpr bool is_same_no_cvref_v = is_same_no_cvref<T, U>::value;
+  constexpr bool is_same_no_cvref_v = is_same_no_cvref<T, U>::value;
 
   template<typename T>
-  ZXSHADY_INLINE_VAR constexpr bool is_class_type_v = is_class_type<T>::value;
+  constexpr bool is_class_type_v = is_class_type<T>::value;
 
   template<typename T>
-  ZXSHADY_INLINE_VAR constexpr bool is_unscoped_enum_v = is_unscoped_enum<T>::value;
+  constexpr bool is_unscoped_enum_v = is_unscoped_enum<T>::value;
 #endif // __cpp_variable_templates
 
 
@@ -435,7 +442,7 @@ namespace tmp {
     return static_cast<typename std::make_unsigned<Integer>::type>(value);
   }
 
-  #if 0
+#if 0
   template<template<typename...> class Template, template<typename...> class TemplateArg, typename... Args>
   std::is_same<Template<Args...>, TemplateArg<Args...>> is_specilization(const TemplateArg<Args...>&);
   template<template<auto...> class Template, template<auto...> class TemplateArg, auto... Args>
@@ -443,14 +450,11 @@ namespace tmp {
   
   template<template<typename,auto...> class Template, template<typename,auto...> class TemplateArg, typename Arg0,auto... Args>
   std::is_same<Template<Arg0,Args...>, TemplateArg<Arg0,Args...>> is_specilization(const volatile TemplateArg<Arg0,Args...>&);
-  
 
-#define ZXSHADY_IS_SPECILIZALION_OF(Template, ...) decltype(is_specilization<Template>(std::declval<__VA_ARGS__>()))
-  #endif
+
+  #define ZXSHADY_IS_SPECILIZALION_OF(Template, ...) decltype(is_specilization<Template>(std::declval<__VA_ARGS__>()))
+#endif
 } // namespace tmp
 } // namespace zxshady
-
-#undef ZXCREATE_VAR_SHORTCUT_ARG
-#undef ZXCREATE_VAR_SHORTCUT_ARGS
 
 #endif

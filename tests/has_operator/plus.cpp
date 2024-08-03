@@ -51,3 +51,12 @@ STATIC_ASSERT(!has_operator_plus<free_l&&>::member);
 
 STATIC_ASSERT(!has_operator_plus<deleted_member>::value);
 STATIC_ASSERT(!has_operator_plus<deleted_free>::value);
+
+#include <vector>
+
+int main()
+{ std::vector<int> a;
+
+  auto iter = a.data();
+  (void)iter;
+}

@@ -27,7 +27,7 @@ namespace tmp {
       struct parse<C> : std::integral_constant<unsigned long long, C - '0'> {};
 
       template<char... Chars>
-      constexpr std::integral_constant<unsigned long long, parse<Chars...>::value> operator""_c()
+      constexpr std::integral_constant<unsigned long long, parse<Chars...>::value> operator""_c() noexcept
       {
         return {};
       }
