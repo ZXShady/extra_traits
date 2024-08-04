@@ -42,8 +42,8 @@ cmake_install.cmake
 
 Debug/
 build/
-include/
-!include/zxshady
+include/*.*
+!include/zxshady/extra_traits
 build_Clang/
 build_GCC/
 
