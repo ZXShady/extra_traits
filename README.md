@@ -50,9 +50,10 @@ each of these has their own header for minimizing includes you can look at the f
 | | less_equal |
 | | greater |
 | | greater_equal |
-| Special | arrow |
+| Accessors | arrow |
 | | subscript |
-| | call |
+| | addressof |
+| Functor | call |
 
 each has_operator_XXX has 4 static members
 
@@ -68,19 +69,25 @@ simple type aliases
 ```cpp
 
 template<std::size_t Value>
-using index_constant = std::integral_constant<std::size_t,Value>;
+using index_c = std::integral_constant<std::size_t,Value>;
 
 template<typename T>
-using alignof_constant = std::integral_constant<std::size_t,alignof(T)>;
+using alignof_c = std::integral_constant<std::size_t,alignof(T)>;
 
 template<typename T>
-using sizeof_constant = std::integral_constant<std::size_t,sizeof(T)>;
+using sizeof_c = std::integral_constant<std::size_t,sizeof(T)>;
 
 // this is avaiable in C++17
 template<auto Value> 
 using constant = std::integral_constant<decltype(Value),Value>;
 
+template<typename Trait>
+using t_ = typename Trait::type; // shortcut trait
 
+template<typename Trait>
+constexpr bool v_ = Trait::value; // shortcut variable
+
+_
 template<typename...>
 using always_false = std::false_type; (var alias : false_v)
 
@@ -111,10 +118,12 @@ using is_unsigned_integral = std::bool_constant<!std::is_same_v<bool,std::remove
 utility functions
 
 ```cpp
-as_const(T&)
-as_volatile(T&)
+as_const(T&) // same as std::as__const
+as_volatile(T&) 
 as_cv(T&)
 forward_like<Like>(T&)
+
+
 ```
 
 Standard Library Features in previous C++ versions
@@ -138,22 +147,37 @@ utility traits
 
 
 ```cpp
- template<typename Enum,typename OrElse>
- underlying_type_or<Enum,OrElse>::type // if `Enum` is an enum then get the underlying type otherwise OrElse type useful to not cause hard errors
-
-
  template<bool Condition,typename Base>
  inherit_if<Condition,Base>::type // if Condition is true then inherit from Base otherwise inherit from empty_base<Base>
-
 ```
 
-non-short circuiting `disjunction` and `conjunction` which may result in faster compilation times.
+non-short circuiting `disjunction` and `conjunction`
 
 ```cpp
 and_<Traits...>::value;
 or_<Traits...>::value;
 
 ```
+
+constructing predicates
+```cpp
+template<template<class...> class... Predicates>
+struct predicate_and;
+
+template<template<class...> class... Predicates>
+struct predicate_or;
+
+template<template<class...> class Predicates>
+struct predicate_not;
+
+// each one of them has a member called 
+// 'invoke' that is used like this
+using is_const_integer = predicate_and<std::is_const,std::is_integral>;
+static_assert(template is_const_integer::invoke<int>::value);
+
+
+```
+
 
 unary traits
 ```cpp
@@ -711,9 +735,9 @@ returns a type_list with N Ts in it
 
 
 ```cpp
-IS_SAME(type_list_repeat_n<5, int>, type_list<int, int, int, int, int>);
-IS_SAME(type_list_repeat_n<0, int>, type_list<>);
-IS_SAME(type_list_repeat_n<1, int>, type_list<int>);
+static_assert(std::is_same_v<type_list_repeat_n<5, int>, type_list<int, int, int, int, int>>);
+static_assert(std::is_same_v<type_list_repeat_n<0, int>, type_list<>>);
+static_assert(std::is_same_v<type_list_repeat_n<1, int>, type_list<int>>);
 ```
 </details>
 

@@ -177,7 +177,7 @@ namespace tmp {
 // is that another Compiler Bug with Microsoft Again???!
 // yes.
 // https://discord.com/channels/583251190591258624/583254410218700800/1263979538883416185
-// :D 
+// :D
 #if defined(__cpp_lib_logical_traits) && !(defined(_MSC_VER) && !(defined(__clang__) || defined(__INTEL_COMPILER)))
   using ::std::conjunction;
   using ::std::conjunction_v;
@@ -189,15 +189,15 @@ namespace tmp {
   template<typename...>
   struct conjunction : std::true_type {};
   template<typename Trait>
-  struct conjunction<Trait> : public Trait {};
+  struct conjunction<Trait> : Trait {};
   template<typename Trait, typename... Traits>
   struct conjunction<Trait, Traits...> :
   ::std::conditional<static_cast<bool>(Trait::value), conjunction<Traits...>, Trait>::type {};
 
   template<typename...>
-  struct disjunction : public std::false_type {};
+  struct disjunction : std::false_type {};
   template<typename Trait>
-  struct disjunction<Trait> : public Trait {};
+  struct disjunction<Trait> : Trait {};
   template<typename Trait, typename... Traits>
   struct disjunction<Trait, Traits...> :
   ::std::conditional<static_cast<bool>(Trait::value), Trait, disjunction<Traits...>>::type {};
@@ -239,10 +239,10 @@ namespace tmp {
 #else
   namespace details {
     template<bool /*is_enum*/, typename>
-    struct is_scoped_enum : public ::std::false_type {};
+    struct is_scoped_enum : ::std::false_type {};
     template<typename Enum>
     struct is_scoped_enum<true, Enum> :
-    public negation<std::is_convertible<Enum, typename ::std::underlying_type<Enum>::type>> {};
+    negation<std::is_convertible<Enum, typename ::std::underlying_type<Enum>::type>> {};
   } // namespace details
 
 
@@ -266,14 +266,14 @@ namespace tmp {
 #else
 
   template<typename>
-  struct is_bounded_array : public std::false_type {};
+  struct is_bounded_array : std::false_type {};
   template<typename T, std::size_t N>
-  struct is_bounded_array<T[N]> : public std::true_type {};
+  struct is_bounded_array<T[N]> : std::true_type {};
 
   template<typename>
-  struct is_unbounded_array : public std::false_type {};
+  struct is_unbounded_array : std::false_type {};
   template<typename T>
-  struct is_unbounded_array<T[]> : public std::true_type {};
+  struct is_unbounded_array<T[]> : std::true_type {};
 
 #endif
 

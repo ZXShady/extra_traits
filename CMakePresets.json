@@ -10,7 +10,6 @@
         "CMAKE_CXX_EXTENSIONS": "OFF",
         "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
         "ZXSHADY_EXTRA_TRAITS_BUILD_TESTS": "ON"
-        //"ZXSHADY_EXTRA_TRAITS_WARNINGS": "ON"
       }
     }
   ]

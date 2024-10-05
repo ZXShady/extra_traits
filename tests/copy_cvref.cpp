@@ -1,6 +1,7 @@
 #include "test.hpp"
+#include <zxshady/extra_traits/qualmanip.hpp>
 
-#define COPY_CVREF(from, to, should) IS_SAME(copy_cvref_t<int from, char to>, type_identity_t<char> should)
+#define COPY_CVREF(from, to, should) IS_SAME(zxshady::tmp::copy_cvref_t<int from, char to>, zxshady::tmp::type_identity_t<char> should)
 
 #define empty /**/
 

@@ -1,6 +1,8 @@
 #include "test.hpp"
 
-#define CLONE_CV(from, to, should) IS_SAME(clone_cv_t<int from, char to>, type_identity_t<char> should)
+#include <zxshady/extra_traits/qualmanip.hpp>
+
+#define CLONE_CV(from, to, should) IS_SAME(zxshady::tmp::clone_cv_t<int from, char to>, zxshady::tmp::type_identity_t<char> should)
 
 #define empty /**/
 

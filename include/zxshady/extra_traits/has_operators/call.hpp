@@ -6,19 +6,20 @@ namespace tmp {
 
   template<typename T, typename... Args>
   struct has_operator_call {
-  private:
 #ifdef __cpp_concepts
+  public:
     static constexpr bool free       = false;
-    static constexpr bool member     = requires(T t, Args... args) { ZXSHADY_FWD(t).operator()(ZXSHADY_FWD(args)...); };
+    static constexpr bool member     = requires(T t, Args... args) { ZXFWD(t).operator()(ZXFWD(args)...); };
     static constexpr bool overloaded = member;
-    static constexpr bool value      = requires(T t, Args... args) { ZXSHADY_FWD(t)(ZXSHADY_FWD(args)...); };
+    static constexpr bool value      = requires(T t, Args... args) { ZXFWD(t)(ZXFWD(args)...); };
 #else
+  private:
     using this_type = has_operator_call;
     template<typename U>
-    static auto member_check(U&& u) -> decltype(ZXSHADY_FWD(u).operator()(std::declval<Args>()...), std::true_type{});
+    static auto member_check(U&& u) -> decltype(ZXFWD(u).operator()(std::declval<Args>()...), std::true_type{});
     static auto member_check(...) -> std::false_type;
     template<typename U>
-    static auto check(U&& u) -> decltype(ZXSHADY_FWD(u)(std::declval<Args>()...), std::true_type{});
+    static auto check(U&& u) -> decltype(ZXFWD(u)(std::declval<Args>()...), std::true_type{});
     static auto check(...) -> std::false_type;
   public:
     static constexpr bool free       = false;

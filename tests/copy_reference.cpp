@@ -1,6 +1,8 @@
 #include "test.hpp"
 
-#define COPY_REFERENCE(from, to,should) IS_SAME(copy_reference_t<int from, char to>, char should)
+#include <zxshady/extra_traits/qualmanip.hpp>
+
+#define COPY_REFERENCE(from, to,should) IS_SAME(zxshady::tmp::copy_reference_t<int from, char to>, char should)
 
 #define empty /**/
 

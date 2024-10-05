@@ -18,21 +18,7 @@ namespace tmp {
   #define ZXSHADY_ENABLE_IF(...) typename ::std::enable_if<(__VA_ARGS__), int>::type = 0
 #endif
 
-#define ZXSHADY_FWD(x) static_cast<decltype(x)&&>(x)
-#define ZXSHADY_MOV(x) static_cast<typename ::std::remove_reference<decltype(x)>::type&&>(x)
-
-#ifdef __cpp_variable_templates
-  #define ZXCREATE_VAR_SHORTCUT_ARG(name, arg_name) \
-    template<typename arg_name>                     \
-    constexpr bool name##_v = name<arg_name>::value
-  #define ZXCREATE_VAR_SHORTCUT_ARGS(name, args_name) \
-    template<typename... args_name>                   \
-    constexpr bool name##_v = name<args_name...>::value
-
-#else
-  #define ZXCREATE_VAR_SHORTCUT_ARG(name, arg_name)   static_assert(true, "")
-  #define ZXCREATE_VAR_SHORTCUT_ARGS(name, args_name) static_assert(true, "")
-
-#endif // __cpp_variable_templates
+#define ZXFWD(x) static_cast<decltype(x)&&>(x)
+#define ZXMOV(x) static_cast<typename ::std::remove_reference<decltype(x)>::type&&>(x)
 
 #endif // !ZXSHADY_EXTRA_TRAITS_MACROS_HPP

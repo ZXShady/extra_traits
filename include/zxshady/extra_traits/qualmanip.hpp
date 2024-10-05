@@ -161,6 +161,18 @@ namespace tmp {
 
   template<typename From, typename To>
   using copy_signedness_t = typename copy_signedness<From, To>::type;
+
+
+  template<typename Like, typename T>
+  constexpr copy_cvref_t<Like&&, T> forward_like(T&& t) noexcept
+  {
+    return static_cast<copy_cvref_t<Like&&, T>>(t);
+  }
+
+  template<typename T, typename U>
+  using has_same_qualifiers = bool_constant<std::is_const<T>::value == std::is_const<U>::value &&
+                                            std::is_volatile<T>::value == std::is_volatile<U>::value>;
+
 } // namespace tmp
 } // namespace zxshady
 

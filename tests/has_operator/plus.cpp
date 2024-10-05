@@ -1,5 +1,8 @@
 #include "../test.hpp"
 #include <zxshady/extra_traits/has_operators.hpp>
+
+namespace Tests {
+using namespace zxshady::tmp;
 struct member {
   void operator+(member) {}
 };
@@ -22,13 +25,13 @@ struct free_l {};
 void operator+(free_l&, free_l&) {}
 
 STATIC_ASSERT(has_operator_plus<member>::value);
-STATIC_ASSERT(has_operator_plus<struct free>::value);
+STATIC_ASSERT(has_operator_plus<free>::value);
 
 STATIC_ASSERT(has_operator_plus<member>::member);
-STATIC_ASSERT(has_operator_plus<struct free>::free);
+STATIC_ASSERT(has_operator_plus<free>::free);
 
 STATIC_ASSERT(!has_operator_plus<member>::free);
-STATIC_ASSERT(!has_operator_plus<struct free>::member);
+STATIC_ASSERT(!has_operator_plus<free>::member);
 
 STATIC_ASSERT(has_operator_plus<member_l&>::value);
 STATIC_ASSERT(has_operator_plus<free_l&>::value);
@@ -52,11 +55,4 @@ STATIC_ASSERT(!has_operator_plus<free_l&&>::member);
 STATIC_ASSERT(!has_operator_plus<deleted_member>::value);
 STATIC_ASSERT(!has_operator_plus<deleted_free>::value);
 
-#include <vector>
-
-int main()
-{ std::vector<int> a;
-
-  auto iter = a.data();
-  (void)iter;
-}
+} // namespace Tests

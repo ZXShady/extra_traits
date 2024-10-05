@@ -7,10 +7,10 @@
   #define ZXSHADY_XMACRO_HAS_POST_INC_DEC_OPERATOR(op_name, op_symbol)                             \
     template<typename T>                                                                           \
     struct has_operator_##op_name {                                                                \
-      static constexpr bool free       = requires(T t) { operator op_symbol(ZXSHADY_FWD(t), 0); }; \
-      static constexpr bool member     = requires(T t) { ZXSHADY_FWD(t).operator op_symbol(0); };  \
+      static constexpr bool free       = requires(T t) { operator op_symbol(ZXFWD(t), 0); }; \
+      static constexpr bool member     = requires(T t) { ZXFWD(t).operator op_symbol(0); };  \
       static constexpr bool overloaded = free || member;                                           \
-      static constexpr bool value      = requires(T t) { ZXSHADY_FWD(t) op_symbol; };              \
+      static constexpr bool value      = requires(T t) { ZXFWD(t) op_symbol; };              \
     }
 #else
   #define ZXSHADY_XMACRO_HAS_POST_INC_DEC_OPERATOR(op_name, op_symbol)                                \

@@ -1,5 +1,5 @@
-#ifndef ZXSHADY_EXTRA_TRAITS_HAS_OPERATORS_ACCESSORS_HPP
-#define ZXSHADY_EXTRA_TRAITS_HAS_OPERATORS_ACCESSORS_HPP
+#ifndef ZXSHADY_EXTRA_TRAITS_HAS_OPERATORS_POINTER_HPP
+#define ZXSHADY_EXTRA_TRAITS_HAS_OPERATORS_POINTER_HPP
 
 #include "impl/xmacros.hpp"
 
@@ -7,6 +7,7 @@ namespace zxshady {
 namespace tmp {
 
   ZXSHADY_XMACRO_HAS_UNARY_OPERATOR(dereference, *);
+  ZXSHADY_XMACRO_HAS_UNARY_OPERATOR(addressof, &);
 
 
 #ifdef __cpp_multidimensional_subscript
@@ -16,10 +17,10 @@ namespace tmp {
     using this_type = has_operator_subscript;
     template<typename U = T>
     static auto member_check(U&& u, Indices&&... indices)
-      -> decltype(ZXSHADY_FWD(u).operator[](ZXSHADY_FWD(indices)...), std::true_type{});
+      -> decltype(ZXFWD(u).operator[](ZXFWD(indices)...), std::true_type{});
     static auto member_check(...) -> std::false_type;
     template<typename U = T>
-    static auto check(U&& u, Indices&&... indices) -> decltype(ZXSHADY_FWD(u)[ZXSHADY_FWD(indices)...], std::true_type{});
+    static auto check(U&& u, Indices&&... indices) -> decltype(ZXFWD(u)[ZXFWD(indices)...], std::true_type{});
     static auto check(...) -> std::false_type;
 
   public:
@@ -35,10 +36,10 @@ namespace tmp {
     using this_type = has_operator_subscript;
     template<typename U = T>
     static auto member_check(U&& u, Index&& index)
-      -> decltype(ZXSHADY_FWD(u).operator[](ZXSHADY_FWD(index)), std::true_type{});
+      -> decltype(ZXFWD(u).operator[](ZXFWD(index)), std::true_type{});
     static auto member_check(...) -> std::false_type;
     template<typename U = T>
-    static auto check(U&& u, Index&& index) -> decltype(ZXSHADY_FWD(u)[ZXSHADY_FWD(index)], std::true_type{});
+    static auto check(U&& u, Index&& index) -> decltype(ZXFWD(u)[ZXFWD(index)], std::true_type{});
     static auto check(...) -> std::false_type;
 
   public:
@@ -53,7 +54,7 @@ namespace tmp {
   struct has_operator_arrow {
   private:
     template<typename U>
-    static auto member_check(U&& u) -> decltype(ZXSHADY_FWD(u).operator->(), std::true_type{});
+    static auto member_check(U&& u) -> decltype(ZXFWD(u).operator->(), std::true_type{});
     static auto member_check(...) -> std::false_type;
   public:
     static constexpr bool free       = false;
@@ -77,6 +78,8 @@ namespace tmp {
   template<typename T>
   constexpr bool has_operator_arrow_v = has_operator_arrow<T>::value;
   
+  template<typename T>
+  constexpr bool has_operator_addressof_v = has_operator_addressof<T>::value;
 
   #ifdef __cpp_multidimensional_subscript
   template<typename T, typename... Indices>
@@ -90,4 +93,4 @@ namespace tmp {
 } // namespace tmp
 } // namespace zxshady
 
-#endif // ZXSHADY_EXTRA_TRAITS_HAS_OPERATORS_ACCESSORS_HPP
+#endif // ZXSHADY_EXTRA_TRAITS_HAS_OPERATORS_POINTER_HPP

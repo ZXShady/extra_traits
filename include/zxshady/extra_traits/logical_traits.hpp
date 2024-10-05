@@ -7,34 +7,34 @@ namespace zxshady {
 namespace tmp {
 
 #ifdef __cpp_fold_expressions
-  template<typename... Traits>
-  using and_ = bool_constant<(!!Traits::value && ...)>;
-  template<typename... Traits>
-  using or_ = bool_constant<(!!Traits::value || ...)>;
+  template<bool... Bools>
+  using and_ = bool_constant<(Bools && ...)>;
+  template<bool... Bools>
+  using or_ = bool_constant<(Bools || ...)>;
 
 #else
-  template<typename... Traits>
-  using and_ = std::is_same<integer_sequence<bool, !!Traits::value...>, integer_sequence<bool, (!!Traits::value || true)...>>;
+  template<bool... Bools>
+  using and_ = std::is_same<integer_sequence<bool,true, Bools...>, integer_sequence<bool, Bools...,true>>;
 
-  template<typename... Traits>
-  using or_ = negation<std::is_same<integer_sequence<bool, !!Traits::value...>, integer_sequence<bool, (!!Traits::value && false)...>>>;
+  template<bool... Bools>
+  using or_ = negation<std::is_same<integer_sequence<bool, false,Bools...>, integer_sequence<bool, Bools...,false>>>;
 #endif
 
 #ifdef __cpp_variable_templates
 
-  template<typename... Traits>
+  template<bool... Bools>
   constexpr bool and_v =
   #ifdef __cpp_fold_expressions
-    (!!Traits::value && ...);
+    (Bools && ...);
   #else
-    and_<Traits...>::value;
+    and_<Bools...>::value;
   #endif // __cpp_fold_expressions
-  template<typename... Traits>
+  template<bool... Bools>
   constexpr bool or_v =
   #ifdef __cpp_fold_expressions
-    (!!Traits::value || ...);
+    (Bools || ...);
   #else
-    or_<Traits::value...>::value;
+    or_<Bools...>::value;
   #endif // __cpp_fold_expressions
 #endif
 } // namespace tmp

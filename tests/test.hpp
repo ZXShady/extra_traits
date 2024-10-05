@@ -1,12 +1,9 @@
 #ifndef TEST_HPP
-  #define TEST_HPP
+#define TEST_HPP
 
-  
+
 #include <cstdio>
 #include <typeinfo>
-#include <zxshady/extra_traits.hpp>
-
-using namespace zxshady::tmp;
 
 template<typename T, typename U>
 constexpr bool is_equal(T t, U u)

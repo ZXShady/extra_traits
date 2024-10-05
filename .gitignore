@@ -1,36 +1,19 @@
-# Prerequisites
-*.d
-
-# Compiled Object files
 *.slo
 *.lo
 *.o
 *.obj
-
-# Precompiled Headers
 *.gch
 *.pch
-
-# Compiled Dynamic libraries
 *.so
 *.dylib
 *.dll
-
-# Fortran module files
-*.mod
-*.smod
-
-# Compiled Static libraries
 *.lai
 *.la
 *.a
 *.lib
-# Executables
 *.exe
 *.out
 *.app
-
-# Solution files
 *.user
 *.vcxproj
 *.vcxproj.user
@@ -40,13 +23,15 @@
 cmake_install.cmake
 .cache/
 
+
 Debug/
 build/
 include/*.*
 !include/zxshady/extra_traits
 build_Clang/
 build_GCC/
-
+buildC/
 CMakeFiles/
 .vs/
 .xmake/
+generators/
